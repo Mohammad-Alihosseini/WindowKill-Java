@@ -1,0 +1,18 @@
+{
+  "profileId": "e677b4cf-53cf-416d-82f7-4378c52008fc",
+  "WAVE_ENEMY_COUNT": [
+    2
+  ],
+  "UPS": 800,
+  "FPS": 80,
+  "EPSILON_MELEE_DAMAGE": 10,
+  "EPSILON_RANGED_DAMAGE": 5,
+  "SOUND_SCALE": 6.0,
+  "SIZE_SCALE": 0.75,
+  "GAME_SPEED": 1.8,
+  "EPSILON_SHOOTING_RAPIDITY": 1,
+  "activeSkillSaveName": "",
+  "acquiredSkillsNames": [],
+  "totalXP": 910,
+  "currentGameXP": 0
+}
