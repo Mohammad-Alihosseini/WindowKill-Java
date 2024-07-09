@@ -10,6 +10,7 @@ public class Variables {
     public static int FPS = 80;
     public static int EPSILON_MELEE_DAMAGE = 10;
     public static int EPSILON_RANGED_DAMAGE = 5;
+    public static int EPSILON_RADIUS = 50;
     public static ArrayList<Point2D> EPSILON_VERTICES = new ArrayList<>();
     public static float SOUND_SCALE = 6;
     public static float SIZE_SCALE = 0.75f;

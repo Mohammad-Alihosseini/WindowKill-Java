@@ -19,7 +19,7 @@ public enum DimensionConstants {
             case BULLET_DIMENSION -> new Dimension((int) BULLET_FACTOR.getValue(), (int) BULLET_FACTOR.getValue());
             case MAIN_MENU_DIMENSION -> new Dimension(700, 800);
             case SETTINGS_MENU_DIMENSION -> new Dimension(900, 400);
-            case SKILL_TREE_DIMENSION -> new Dimension(900, 750);
+            case SKILL_TREE_DIMENSION -> new Dimension(900, 950);
             case PAUSE_MENU_DIMENSION -> new Dimension(900, 750);
         };
     }
