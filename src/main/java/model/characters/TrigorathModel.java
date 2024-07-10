@@ -13,14 +13,14 @@ import static model.Utils.roundPoint;
 public class TrigorathModel extends GeoShapeModel {
     public TrigorathModel(Point anchor, String motionPanelId) {
         super(new Point(0, 0), TRIGORATH_VERTICES.getValue(), TRIGORATH_HEALTH.getValue());
-        this.isCircular = false;
-        this.motionPanelId = motionPanelId;
-        this.anchorSave = getCenter();
-        damageSize.put(AttackTypes.MELEE, TRIGORATH_MELEE_DAMAGE.getValue());
-        createTrigorath(modelId, roundPoint(anchorSave), motionPanelId);
+        this.setCircular(false);
+        setMotionPanelId(motionPanelId);
+        this.setAnchorSave(getCenter());
+        getDamageSize().put(AttackTypes.MELEE, TRIGORATH_MELEE_DAMAGE.getValue());
+        createTrigorath(getModelId(), roundPoint(getAnchorSave()), motionPanelId);
         moveShapeModel(anchor);
-        movement.setAnchor(anchor);
-        numberOfCollectibles = 2;
-        collectibleValue = 5;
+        getMovement().setAnchor(anchor);
+        setNumberOfCollectibles(2);
+        setCollectibleValue(5);
     }
 }

@@ -17,7 +17,7 @@ import static view.containers.GlassFrame.getGlassFrame;
 public class Message extends JLabel implements TopElement {
     private final JFrame frame;
     private final Color foregroundColor = BLOOD_RED.darker().darker();
-    public float exactLength;
+    private final float exactLength;
     private float opacity = 1f;
 
     public Message(MessageType type) {
@@ -43,10 +43,10 @@ public class Message extends JLabel implements TopElement {
         fadeTimer.addActionListener(e -> {
             long elapsedTime = System.nanoTime() - startTime;
             pinOnTop();
-            opacity = DefaultMethods.fadeCurve((float) elapsedTime / exactLength);
+            opacity = DefaultMethods.fadeCurve(elapsedTime / getExactLength());
             setBackground(new Color(0, 0, 0, opacity));
             setForeground(changeColorOpacity(foregroundColor, opacity));
-            if (elapsedTime > exactLength) {
+            if (elapsedTime > getExactLength()) {
                 frame.getContentPane().remove(this);
                 this.setVisible(false);
                 PauseMenu.setPauseAccess(true);
@@ -63,11 +63,15 @@ public class Message extends JLabel implements TopElement {
         return frame;
     }
 
+    public float getExactLength() {
+        return exactLength;
+    }
+
     public enum MessageType {
         NIHIL, UNUS, DUO, TRES, QUATTUOR, QUINQUE, SEX, GAME_OVER;
 
         public String getValue() {
-            if (this.equals(GAME_OVER)) return "GAME OVER";
+            if (this==GAME_OVER) return "GAME OVER";
             return name();
         }
     }

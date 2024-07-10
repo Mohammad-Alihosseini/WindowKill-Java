@@ -36,9 +36,9 @@ public enum Ability {
             case HEPHAESTUS -> e -> emitImpactWave(EpsilonModel.getINSTANCE().getAnchor(), HEPHAESTUS_ABILITY_WAVE_POWER.getValue());
             case ATHENA -> e -> {
                 EpsilonModel.getINSTANCE().setShootingRapidity((int) ATHENA_ABILITY_SHOOTING_RAPIDITY.getValue());
-                new Timer((int) ATHENA_ABILITY_TIME.getValue(), e1 -> EpsilonModel.getINSTANCE().setShootingRapidity(EPSILON_SHOOTING_RAPIDITY.getValue())) {{
-                    setRepeats(false);
-                }}.start();
+                Timer timer=new Timer((int) ATHENA_ABILITY_TIME.getValue(), e1 -> EpsilonModel.getINSTANCE().setShootingRapidity(EPSILON_SHOOTING_RAPIDITY.getValue()));
+                timer.setRepeats(false);
+                timer.start();
             };
             case APOLLO -> e -> EpsilonModel.getINSTANCE().addHealth((int) APOLLO_ABILITY_HEALING_AMOUNT.getValue());
         };

@@ -5,27 +5,24 @@ import model.Profile;
 import model.WaveManager;
 import model.characters.EpsilonModel;
 import model.characters.GeoShapeModel;
-import model.collision.Collidable;
 import model.collision.Collision;
+import model.movement.Movable;
 import view.characters.GeoShapeView;
 import view.containers.MotionPanelView;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static controller.UserInterfaceController.*;
-import static controller.constants.DimensionConstants.Dimension2DConstants.MAIN_MOTIONPANEL_DIMENSION;
 import static controller.constants.ViewConstants.BASE_PAINT_OPACITY;
-import static model.MotionPanelModel.allMotionPanelModelsList;
-import static model.MotionPanelModel.mainMotionPanelModel;
+import static model.MotionPanelModel.*;
 import static model.characters.GeoShapeModel.allShapeModelsList;
 import static view.containers.GlassFrame.getGlassFrame;
-import static view.containers.GlassFrame.setupHUI;
 import static view.containers.MotionPanelView.allMotionPanelViewsList;
-import static view.containers.MotionPanelView.mainMotionPanelView;
+import static view.containers.MotionPanelView.getMainMotionPanelView;
 
 public final class GameLoop implements Runnable {
     private static GameLoop INSTANCE = null;
@@ -38,15 +35,15 @@ public final class GameLoop implements Runnable {
     private long lastUpdateTime;
     private long timeSaveDiffCapture = 0;
     private long timeSave;
-    private volatile String FPS_UPS = "";
+    private volatile String fpsUps = "";
 
     public static void updateView() {
         for (MotionPanelView motionPanelView : allMotionPanelViewsList) {
-            int[] properties = getMotionPanelProperties(motionPanelView.viewId);
+            int[] properties = getMotionPanelProperties(motionPanelView.getViewId());
             motionPanelView.setBounds(properties[0], properties[1], properties[2], properties[3]);
             for (GeoShapeView shapeView : motionPanelView.shapeViews) {
-                shapeView.rotatedIcon.opacity = BASE_PAINT_OPACITY.getValue() + getHealthScale(shapeView.viewId) / 2;
-                shapeView.vertexLocations = getGeoShapeVertices(shapeView.viewId);
+                shapeView.getRotatedIcon().setOpacity(BASE_PAINT_OPACITY.getValue() + getHealthScale(shapeView.getViewId())*(1- BASE_PAINT_OPACITY.getValue()));
+                shapeView.setVertexLocations(getGeoShapeVertices(shapeView.getViewId()));
             }
         }
         getGlassFrame().repaint();
@@ -78,69 +75,60 @@ public final class GameLoop implements Runnable {
         running.set(true);
         exit.set(false);
         initializeGame();
-        setupHUI();
 
-        int frames = 0, ticks = 0;
-        double deltaU = 0, deltaF = 0;
+        AtomicInteger frames = new AtomicInteger(0), ticks = new AtomicInteger(0);
+        AtomicFloat deltaU = new AtomicFloat(0), deltaF = new AtomicFloat(0);
         currentTime = System.nanoTime();
         lastFrameTime = currentTime;
         lastUpdateTime = currentTime;
         timeSave = currentTime;
-        double timePerFrame = (double) TimeUnit.SECONDS.toNanos(1) / Profile.getCurrent().FPS;
-        double timePerUpdate = (double) TimeUnit.SECONDS.toNanos(1) / Profile.getCurrent().UPS;
-
-        new Thread(() -> {
-            while (!exit.get()) {
-                if (!FPS_UPS.equals("")) {
-                    System.out.println(FPS_UPS);
-                    FPS_UPS = "";
-                }
-            }
-        }) {{
-            setDaemon(true);
-        }}.start();
+        float timePerFrame = (float) TimeUnit.SECONDS.toNanos(1) / Profile.getCurrent().getFps();
+        float timePerUpdate = (float) TimeUnit.SECONDS.toNanos(1) / Profile.getCurrent().getUps();
 
         while (!exit.get()) {
             if (running.get()) {
                 currentTime = System.nanoTime();
-                if (deltaU >= 1) {
-                    updateModel();
-                    ticks++;
-                    deltaU--;
-                }
-                if (deltaF >= 1) {
-                    updateView();
-                    frames++;
-                    deltaF--;
-                }
-                if (currentTime - lastFrameTime > timePerFrame) {
-                    deltaF += (currentTime - lastFrameTime - timePerFrame) / timePerFrame;
-                    updateView();
-                    frames++;
-                    lastFrameTime = currentTime;
-                }
-                if (currentTime - lastUpdateTime > timePerUpdate) {
-                    deltaU += (currentTime - lastUpdateTime - timePerUpdate) / timePerUpdate;
-                    updateModel();
-                    ticks++;
-                    lastUpdateTime = currentTime;
-                }
-                if (currentTime - timeSave >= TimeUnit.SECONDS.toNanos(1)) {
-                    FPS_UPS = "FPS: " + frames + " | UPS:" + ticks;
-                    frames = 0;
-                    ticks = 0;
-                    timeSave = currentTime;
-                }
+                gameLoopCycle(frames,ticks,deltaF,deltaU,timePerFrame,timePerUpdate);
             }
+        }
+    }
+    public void gameLoopCycle(AtomicInteger frames,AtomicInteger ticks, AtomicFloat deltaF,AtomicFloat deltaU, float timePerFrame, float timePerUpdate){
+        if (deltaU.get() >= 1) {
+            updateModel();
+            ticks.addAndGet(1);
+            deltaU.addAndGet(-1);
+        }
+        if (deltaF.get() >= 1) {
+            updateView();
+            frames.addAndGet(1);
+            deltaF.addAndGet(-1);
+        }
+        if (currentTime - lastFrameTime > timePerFrame) {
+            deltaF.addAndGet((currentTime - lastFrameTime - timePerFrame) / timePerFrame);
+            updateView();
+            frames.addAndGet(1);
+            lastFrameTime = currentTime;
+        }
+        if (currentTime - lastUpdateTime > timePerUpdate) {
+            deltaU.addAndGet((currentTime - lastUpdateTime - timePerUpdate) / timePerUpdate);
+            updateModel();
+            ticks.addAndGet(1);
+            lastUpdateTime = currentTime;
+        }
+        if (currentTime - timeSave >= TimeUnit.SECONDS.toNanos(1)) {
+            fpsUps = "<html>FPS: " + frames + " <br/>UPS:" + ticks+"</html>";
+            frames.set(0);
+            ticks.set(0);
+            timeSave = currentTime;
         }
     }
 
     public void initializeGame() {
-        mainMotionPanelModel = new MotionPanelModel(MAIN_MOTIONPANEL_DIMENSION.getValue());
-        playGameTheme(mainMotionPanelView);
+        getMainMotionPanelModel();
+        playGameTheme(getMainMotionPanelView());
         EpsilonModel.getINSTANCE();
-        UserInputHandler.getINSTANCE().setupInputHandler(mainMotionPanelView);
-        mainMotionPanelView.requestFocus();
+        UserInputHandler.getINSTANCE().setupInputHandler(getMainMotionPanelView());
+        getMainMotionPanelView().requestFocus();
         new WaveManager().start();
     }
 
@@ -149,35 +137,27 @@ public final class GameLoop implements Runnable {
     }
 
     public void toggleGameLoop() {
-        if (mainMotionPanelView == null || !mainMotionPanelView.isVisible()) new Thread(this) {{
-            setDaemon(true);
-        }}.start();
+        if (getMainMotionPanelView() == null || !getMainMotionPanelView().isVisible()) {
+            Thread thread=new Thread(this);
+            thread.setDaemon(true);
+            thread.start();
+        }
         else {
             if (running.get()) {
                 long now = System.nanoTime();
                 updateTimeDiffCapture = now - lastUpdateTime;
                 frameTimeDiffCapture = now - lastFrameTime;
                 timeSaveDiffCapture = now - timeSave;
-                UserInputHandler.getINSTANCE().shootTimeDiffCapture = now - UserInputHandler.getINSTANCE().lastShootingTime;
-                for (Collidable collidable : new CopyOnWriteArrayList<Collidable>() {{
-                    addAll(allMotionPanelModelsList);
-                    addAll(allShapeModelsList);
-                }}) {
-                    collidable.setPositionUpdateTimeDiffCapture(now - collidable.getLastPositionUpdateTime());
-                }
+                UserInputHandler.getINSTANCE().setShootTimeDiffCapture(now - UserInputHandler.getINSTANCE().getLastShootingTime());
+                for (Movable movable: Movable.movables) movable.setPositionUpdateTimeDiffCapture(now - movable.getLastPositionUpdateTime());
             }
             if (!running.get()) {
                 currentTime = System.nanoTime();
                 lastUpdateTime = currentTime - updateTimeDiffCapture;
                 lastFrameTime = currentTime - frameTimeDiffCapture;
                 timeSave = currentTime - timeSaveDiffCapture;
-                UserInputHandler.getINSTANCE().lastShootingTime = currentTime - UserInputHandler.getINSTANCE().shootTimeDiffCapture;
-                for (Collidable collidable : new CopyOnWriteArrayList<Collidable>() {{
-                    addAll(allMotionPanelModelsList);
-                    addAll(allShapeModelsList);
-                }}) {
-                    collidable.setLastPositionUpdateTime(currentTime - collidable.getPositionUpdateTimeDiffCapture());
-                }
+                UserInputHandler.getINSTANCE().setLastShootingTime(currentTime - UserInputHandler.getINSTANCE().getShootTimeDiffCapture());
+                for (Movable movable: Movable.movables) movable.setLastPositionUpdateTime(currentTime - movable.getPositionUpdateTimeDiffCapture());
             }
         }
         running.set(!running.get());
@@ -189,4 +169,8 @@ public final class GameLoop implements Runnable {
         return !exit.get();
     }
     public void setRunning(boolean running){this.running.set(running);}
+    public static String getFpsUps(){
+        if (INSTANCE!=null && getINSTANCE().isOn() && getINSTANCE().isRunning()) return getINSTANCE().fpsUps;
+        return "";
+    }
 }

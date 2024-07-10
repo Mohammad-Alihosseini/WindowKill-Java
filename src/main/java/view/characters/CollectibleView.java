@@ -5,12 +5,13 @@ import view.containers.MotionPanelView;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static controller.constants.DefaultMethods.GET_AVERAGE_TONE_OF_CHARACTER;
 import static controller.constants.ViewConstants.COLLECTIBLE_SIZE_OFFSET;
 
 public class CollectibleView extends GeoShapeView {
-    public static volatile ConcurrentHashMap<Class<?>, BufferedImage> collectibleImageCache = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Class<?>, BufferedImage> collectibleImageCache = new ConcurrentHashMap<>();
 
     public CollectibleView(Point relativeAnchorLocation, int value, GeoShapeView ancestor, MotionPanelView motionPanelView) {
         super(createCollectibleImage(ancestor, (int) (value + COLLECTIBLE_SIZE_OFFSET.getValue())),

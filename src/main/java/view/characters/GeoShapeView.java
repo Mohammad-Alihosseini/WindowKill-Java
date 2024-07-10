@@ -4,23 +4,23 @@ import view.Utils;
 import view.containers.MotionPanelView;
 import view.containers.RotatedIcon;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static model.Utils.relativeLocation;
 import static view.Utils.rotatedInfo;
+import static view.Utils.toBufferedImage;
 
 public class GeoShapeView {
-    public volatile static CopyOnWriteArrayList<GeoShapeView> allShapeViewsList = new CopyOnWriteArrayList<>();
-    public volatile static ConcurrentHashMap<String, BufferedImage> rawImageHashMap = new ConcurrentHashMap<>();
-    public String viewId;
-    public RotatedIcon rotatedIcon;
-    public CopyOnWriteArrayList<Point> vertexLocations = new CopyOnWriteArrayList<>();
+    public static final List<GeoShapeView> allShapeViewsList = new CopyOnWriteArrayList<>();
+    public static final ConcurrentMap<String, BufferedImage> rawImageHashMap = new ConcurrentHashMap<>();
+    private String viewId;
+    private RotatedIcon rotatedIcon;
+    private List<Point> vertexLocations = new CopyOnWriteArrayList<>();
     Dimension viewSize;
     Point relativeAnchorLocation;
     boolean isCircular;
@@ -31,32 +31,28 @@ public class GeoShapeView {
         this.viewSize = viewSize;
         this.relativeAnchorLocation = relativeAnchorLocation;
         this.image = image;
-        this.rotatedIcon = new RotatedIcon(Utils.bufferedImageClone(resized), new Point(relativeAnchorLocation), 0, isCircular);
+        this.setRotatedIcon(new RotatedIcon(Utils.bufferedImageClone(resized), new Point(relativeAnchorLocation), 0, isCircular));
         this.isCircular = isCircular;
         allShapeViewsList.add(this);
         motionPanelView.shapeViews.add(this);
     }
 
     public static BufferedImage getRawImage(String imagePath) {
-        try {
-            if (!rawImageHashMap.containsKey(imagePath)) rawImageHashMap.put(imagePath, ImageIO.read(new File(imagePath)));
-            return rawImageHashMap.get(imagePath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        rawImageHashMap.computeIfAbsent(imagePath, k -> toBufferedImage(imagePath));
+        return rawImageHashMap.get(imagePath);
     }
 
     public void moveShapeView(Point newAnchorLocation) {
-        rotatedIcon.corner = (Point) relativeLocation(newAnchorLocation, rotatedIcon.getRotationAnchor());
+        getRotatedIcon().setCorner((Point) relativeLocation(newAnchorLocation, getRotatedIcon().getRotationAnchor()));
     }
 
-    public void rotateShapeView(double angle) {
-        rotatedIcon.rotate(angle);
-        Dimension viewSizeSave = new Dimension(rotatedIcon.icon.getIconWidth(), rotatedIcon.icon.getIconHeight());
-        Point[] rotatedInfo = rotatedInfo(viewSizeSave, rotatedIcon.getRotationAnchor(), rotatedIcon.degrees, rotatedIcon.isCircular);
-        rotatedIcon.offset = new Point(rotatedIcon.corner.x - rotatedInfo[1].x, rotatedIcon.corner.y - rotatedInfo[1].y);
-        rotatedIcon.width = rotatedInfo[0].x;
-        rotatedIcon.height = rotatedInfo[0].y;
+    public void rotateShapeView(float angle) {
+        getRotatedIcon().rotate(angle);
+        Dimension viewSizeSave = new Dimension(getRotatedIcon().getIcon().getIconWidth(), getRotatedIcon().getIcon().getIconHeight());
+        Point[] rotatedInfo = rotatedInfo(viewSizeSave, getRotatedIcon().getRotationAnchor(), getRotatedIcon().getDegrees(), getRotatedIcon().isCircular());
+        getRotatedIcon().setOffset(new Point(getRotatedIcon().getCorner().x - rotatedInfo[1].x, getRotatedIcon().getCorner().y - rotatedInfo[1].y));
+        getRotatedIcon().setWidth(rotatedInfo[0].x);
+        getRotatedIcon().setHeight(rotatedInfo[0].y);
     }
 
     public String getViewId() {
@@ -65,5 +61,21 @@ public class GeoShapeView {
 
     public void setViewId(String viewId) {
         this.viewId = viewId;
+    }
+
+    public RotatedIcon getRotatedIcon() {
+        return rotatedIcon;
+    }
+
+    public void setRotatedIcon(RotatedIcon rotatedIcon) {
+        this.rotatedIcon = rotatedIcon;
+    }
+
+    public List<Point> getVertexLocations() {
+        return vertexLocations;
+    }
+
+    public void setVertexLocations(List<Point> vertexLocations) {
+        this.vertexLocations = vertexLocations;
     }
 }

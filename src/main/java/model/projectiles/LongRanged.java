@@ -11,7 +11,7 @@ import static controller.UserInterfaceController.playShootSoundEffect;
 import static controller.constants.EntityConstants.EPSILON_RAPID_SHOOTING_DELAY;
 import static model.Utils.roundPoint;
 
-public interface Long_Ranged extends Collidable {
+public interface LongRanged extends Collidable {
     String getMotionPanelId();
 
     int getShootingRapidity();
@@ -20,9 +20,8 @@ public interface Long_Ranged extends Collidable {
 
     default void shoot(GeoShapeModel shooter, Direction direction, int damage) {
         AtomicInteger cnt = new AtomicInteger();
-        Timer rapidFire = new Timer(EPSILON_RAPID_SHOOTING_DELAY.getValue(), null) {{
-            setCoalesce(true);
-        }};
+        Timer rapidFire = new Timer(EPSILON_RAPID_SHOOTING_DELAY.getValue(), null);
+        rapidFire.setCoalesce(true);
         rapidFire.addActionListener(e -> {
             new BulletModel(roundPoint(getAnchor()), getMotionPanelId(), damage) {
                 @Override

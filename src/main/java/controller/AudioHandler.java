@@ -12,13 +12,15 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static controller.constants.DefaultMethods.getVolumeDB;
 import static controller.constants.FilePaths.*;
 
 public abstract class AudioHandler {
-    public static final ConcurrentHashMap<Clip, SoundEffectType> clips = new ConcurrentHashMap<>();
+    public static final ConcurrentMap<Clip, SoundEffectType> clips = new ConcurrentHashMap<>();
+    public static final Random random=new Random();
 
     public static synchronized float playSoundEffect(SoundEffectType type, int i) {
         ClipControlled clipControlled = playSoundEffect(getSoundEffectPath(type, i));
@@ -62,8 +64,8 @@ public abstract class AudioHandler {
     }
 
     public static synchronized ClipControlled playSoundEffect(String address) {
-        Clip clip = null;
-        float length = 0;
+        Clip clip;
+        float length;
         try {
             File file = new File(address);
             long audioFileLength = file.length();
@@ -80,16 +82,15 @@ public abstract class AudioHandler {
             float frameRate = format.getFrameRate();
             length = audioFileLength / (frameSize * frameRate);
             new Thread(finalClip::start).start();
-        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException ignored) {
-        }
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {throw new UnsupportedOperationException("Playback failed for: "+address);}
         return new ClipControlled(clip, length);
     }
 
-    public static String getSoundEffectPath(SoundEffectType type) {
-        return getSoundEffectPath(type, new Random().nextInt(0, Integer.MAX_VALUE));
+    public static String getSoundEffectPath(AudioHandler.SoundEffectType type) {
+        return getSoundEffectPath(type, random.nextInt(0, Integer.MAX_VALUE));
     }
 
-    public static String getSoundEffectPath(SoundEffectType type, int i) {
+    public static String getSoundEffectPath(AudioHandler.SoundEffectType type, int i) {
         String address = switch (type) {
             case HIT -> HIT_SOUND_EFFECTS_PATH.getValue();
             case DOWN -> DOWN_SOUND_EFFECTS_PATH.getValue();
@@ -110,7 +111,7 @@ public abstract class AudioHandler {
     public static void setVolume(Clip clip) {
         if (clip == null) return;
         FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-        float volume = getVolumeDB(clip) * Profile.getCurrent().SOUND_SCALE;
+        float volume = getVolumeDB(clip) * Profile.getCurrent().getSoundScale();
         gainControl.setValue(20f * (float) Math.log10(volume));
     }
 

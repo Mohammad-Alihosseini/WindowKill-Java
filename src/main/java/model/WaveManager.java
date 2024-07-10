@@ -9,6 +9,7 @@ import view.menu.MainMenu;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
@@ -19,8 +20,9 @@ import static controller.constants.WaveConstants.MIN_ENEMY_SPAWN_RADIUS;
 import static model.Utils.*;
 
 public class WaveManager {
-    public final CopyOnWriteArrayList<Integer> waveCount = Profile.getCurrent().WAVE_ENEMY_COUNT;
-    private final CopyOnWriteArrayList<GeoShapeModel> waveEntities = new CopyOnWriteArrayList<>();
+    public final List<Integer> waveCount = Profile.getCurrent().getWaveEnemyCount();
+    private final List<GeoShapeModel> waveEntities = new CopyOnWriteArrayList<>();
+    public static final Random random = new Random();
 
     public void start() {
         initiateWave(0);
@@ -29,13 +31,12 @@ public class WaveManager {
     public void lockEnemies() {
         for (GeoShapeModel model : waveEntities) {
             if (!(model instanceof EpsilonModel)) {
-                model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().modelId);
+                model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
             }
         }
     }
 
     public void randomSpawn(int wave) {
-        Random random = new Random();
         for (int i = 0; i < waveCount.get(wave); i++) {
             Point location = roundPoint(addUpPoints(EpsilonModel.getINSTANCE().getAnchor(),
                     multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
@@ -60,7 +61,7 @@ public class WaveManager {
         waveTimer.addActionListener(e -> {
             boolean waveFinished = true;
             for (GeoShapeModel shapeModel : waveEntities) {
-                if (shapeModel.health > 0) {
+                if (shapeModel.getHealth() > 0) {
                     waveFinished = false;
                     break;
                 }
@@ -77,13 +78,13 @@ public class WaveManager {
     }
 
     public void finishGame(float lastSceneTime) {
-        new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) lastSceneTime), e -> {
+        Timer timer=new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) lastSceneTime), e -> {
             exitGame();
             Profile.getCurrent().saveXP();
             MainMenu.flushINSTANCE();
             MainMenu.getINSTANCE().togglePanel();
-        }) {{
-            setRepeats(false);
-        }}.start();
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 }
