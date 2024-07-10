@@ -1,5 +1,6 @@
 package view.containers;
 
+import view.base.PanelB;
 import view.characters.GeoShapeView;
 
 import javax.swing.*;
@@ -15,12 +16,13 @@ import static view.Utils.toBufferedImage;
 import static view.containers.GlassFrame.getGlassFrame;
 
 public class MotionPanelView extends PanelB {
-    private static MotionPanelView mainMotionPanelView;
     public static final List<MotionPanelView> allMotionPanelViewsList = new CopyOnWriteArrayList<>();
+    private static MotionPanelView mainMotionPanelView;
     public final List<GeoShapeView> shapeViews = new CopyOnWriteArrayList<>();
     private String viewId;
+
     public MotionPanelView(Dimension size, Point location) {
-        super(size.width, size.height,toBufferedImage(GAME_BACKGROUND_PATH.getValue()));
+        super(size.width, size.height, toBufferedImage(GAME_BACKGROUND_PATH.getValue()));
 
         if (getMainMotionPanelView() == null) setMainMotionPanelView(this);
         setBackground(new Color(0, 0, 0, 0));

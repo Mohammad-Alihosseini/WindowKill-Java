@@ -2,8 +2,6 @@ package controller.constants;
 
 import model.Profile;
 
-import static controller.constants.Variables.EPSILON_RADIUS;
-
 public enum ViewConstants {
     VERTEX_RADIUS, BASE_PAINT_OPACITY, EPSILON_FACTOR, TRIGORATH_FACTOR,
     SQUARANTINE_FACTOR, BULLET_FACTOR, COLLECTIBLE_SIZE_OFFSET;
@@ -16,10 +14,6 @@ public enum ViewConstants {
             case TRIGORATH_FACTOR -> Profile.getCurrent().getSizeScale() * 70;
             case SQUARANTINE_FACTOR -> Profile.getCurrent().getSizeScale() * 60;
             case BULLET_FACTOR -> Profile.getCurrent().getSizeScale() * 20;
-            case EPSILON_FACTOR -> Profile.getCurrent().SIZE_SCALE * EPSILON_RADIUS;
-            case TRIGORATH_FACTOR -> Profile.getCurrent().SIZE_SCALE * 70;
-            case SQUARANTINE_FACTOR -> Profile.getCurrent().SIZE_SCALE * 60;
-            case BULLET_FACTOR -> Profile.getCurrent().SIZE_SCALE * 20;
             case COLLECTIBLE_SIZE_OFFSET -> 9;
         };
     }

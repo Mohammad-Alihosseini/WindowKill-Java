@@ -1,9 +1,9 @@
 package view.menu;
 
 import model.Profile;
-import view.containers.ButtonB;
-import view.containers.PanelB;
-import view.containers.SliderB;
+import view.base.ButtonB;
+import view.base.PanelB;
+import view.base.SliderB;
 
 import java.util.List;
 
@@ -29,8 +29,8 @@ public class SettingsMenu extends PanelB {
 
         ButtonB back = new ButtonB(ButtonB.ButtonType.SMALL_MENU_BUTTON, "BACK", (int) BACK_BUTTON_WIDTH.getValue(), BACK_BUTTON_FONT_SCALE.getValue(), false);
         back.addActionListener(e -> {
-                SettingsMenu.getINSTANCE().togglePanel();
-                MainMenu.getINSTANCE().togglePanel();
+            SettingsMenu.getINSTANCE().togglePanel();
+            MainMenu.getINSTANCE().togglePanel();
         });
 
         getConstraints().gridwidth = 1;

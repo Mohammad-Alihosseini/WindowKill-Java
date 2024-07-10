@@ -37,7 +37,8 @@ public final class Collision implements Runnable {
         CopyOnWriteArrayList<MovementState.ShapeMovementState> out = new CopyOnWriteArrayList<>();
         for (GeoShapeModel shapeModel : allShapeModelsList) {
             if (shapeModel instanceof BulletModel || (shapeModel instanceof CollectibleModel collectibleModel &&
-                    state.stateOf1.collidable != collectibleModel.ancestor && state.stateOf2.collidable != collectibleModel.ancestor)) continue;
+                    state.stateOf1.collidable != collectibleModel.ancestor && state.stateOf2.collidable != collectibleModel.ancestor))
+                continue;
 
             float distance = (float) shapeModel.getMovement().getAnchor().distance(state.collisionPoint);
             float scale = (distance > IMPACT_RADIUS.getValue()) ? 0 : (IMPACT_SCALE.getValue() * IMPACT_RADIUS.getValue() - distance) / IMPACT_RADIUS.getValue();
@@ -55,7 +56,7 @@ public final class Collision implements Runnable {
                     torque = scale * state.stateOf2.torque;
                 }
             }
-            out.add(new MovementState.ShapeMovementState(shapeModel,direction,torque,scale));
+            out.add(new MovementState.ShapeMovementState(shapeModel, direction, torque, scale));
         }
         return out;
     }
@@ -64,7 +65,8 @@ public final class Collision implements Runnable {
         List<MovementState.ShapeMovementState> collisionData = evaluateMovementEffects(state, artificialImpact);
         for (MovementState.ShapeMovementState movementState : collisionData) {
             movementState.geoShapeModel.getMovement().impact(movementState.direction, wavePower * movementState.scale);
-            if (movementState.torque != 0) movementState.geoShapeModel.getMovement().setAngularSpeed(movementState.torque);
+            if (movementState.torque != 0)
+                movementState.geoShapeModel.getMovement().setAngularSpeed(movementState.torque);
         }
     }
 
@@ -78,7 +80,7 @@ public final class Collision implements Runnable {
 
     public static void evaluatePhysicalEffects(MovementState.CollisionState state) {
         if (state.stateOf1.collidable instanceof Entity entity1 && state.stateOf2.collidable instanceof Entity entity2 && state.collisionPoint != null) {
-            Pair<Boolean,Boolean> meleePair=checkMelee(state);
+            Pair<Boolean, Boolean> meleePair = checkMelee(state);
             if (meleePair.getLeft() && meleePair.getRight()) return;
             if (entity1.isVulnerable() && (state.stateOf2.collidable instanceof BulletModel || state.stateOf1.collidable instanceof CollectibleModel || meleePair.getRight())) {
                 entity2.damage(entity1, AttackTypes.MELEE);
@@ -88,14 +90,16 @@ public final class Collision implements Runnable {
             }
         }
     }
-    public static Pair<Boolean,Boolean> checkMelee(MovementState.CollisionState state){
+
+    public static Pair<Boolean, Boolean> checkMelee(MovementState.CollisionState state) {
         boolean melee1to2 = state.stateOf1.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
                 (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
         boolean melee2to1 = state.stateOf2.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
                 (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
-        return new MutablePair<>(melee1to2,melee2to1);
+        return new MutablePair<>(melee1to2, melee2to1);
     }
-    public static void resolveCollectiblePickup(MovementState.CollisionState state){
+
+    public static void resolveCollectiblePickup(MovementState.CollisionState state) {
         if (state.stateOf1.collidable instanceof EpsilonModel && state.stateOf2.collidable instanceof CollectibleModel) {
             Profile.getCurrent().setCurrentGameXP(Profile.getCurrent().getCurrentGameXP() + ((CollectibleModel) state.stateOf2.collidable).getValue());
         }
@@ -109,19 +113,20 @@ public final class Collision implements Runnable {
         Collidable.CreateAllGeometries();
         List<MovementState.CollisionState> collisionStates = getAllMomentaryCollisions();
         for (MovementState.CollisionState state : collisionStates) {
-            boolean notNull=state.stateOf1!=null && state.stateOf2!=null;
+            boolean notNull = state.stateOf1 != null && state.stateOf2 != null;
             if (!notNull) continue;
             if (state.stateOf1.collidable instanceof BulletModel bulletModel) bulletModel.eliminate();
             if (state.stateOf2.collidable instanceof BulletModel bulletModel) bulletModel.eliminate();
             evaluatePhysicalEffects(state);
             resolveCollectiblePickup(state);
-            boolean areBulletMotionPanel =  areInstancesOf(state.stateOf1.collidable, state.stateOf2.collidable, MotionPanelModel.class, BulletModel.class);
+            boolean areBulletMotionPanel = areInstancesOf(state.stateOf1.collidable, state.stateOf2.collidable, MotionPanelModel.class, BulletModel.class);
             boolean areEpsilonCollectible = areInstancesOf(state.stateOf1.collidable, state.stateOf2.collidable, EpsilonModel.class, CollectibleModel.class);
             if (areBulletMotionPanel) getMainMotionPanelModel().extend(roundPoint(state.collisionPoint));
             else if (!areEpsilonCollectible) emitImpactWave(state);
         }
     }
-    public List<MovementState.CollisionState> getAllMomentaryCollisions(){
+
+    public List<MovementState.CollisionState> getAllMomentaryCollisions() {
         CopyOnWriteArrayList<MovementState.CollisionState> collisionStates = new CopyOnWriteArrayList<>();
         for (int i = 0; i < Collidable.collidables.size(); i++) {
             for (int j = i + 1; j < Collidable.collidables.size(); j++) {

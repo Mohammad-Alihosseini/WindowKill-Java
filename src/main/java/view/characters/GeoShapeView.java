@@ -18,13 +18,13 @@ import static view.Utils.toBufferedImage;
 public class GeoShapeView {
     public static final List<GeoShapeView> allShapeViewsList = new CopyOnWriteArrayList<>();
     public static final ConcurrentMap<String, BufferedImage> rawImageHashMap = new ConcurrentHashMap<>();
-    private String viewId;
-    private RotatedIcon rotatedIcon;
-    private List<Point> vertexLocations = new CopyOnWriteArrayList<>();
     Dimension viewSize;
     Point relativeAnchorLocation;
     boolean isCircular;
     BufferedImage image;
+    private String viewId;
+    private RotatedIcon rotatedIcon;
+    private List<Point> vertexLocations = new CopyOnWriteArrayList<>();
 
     public GeoShapeView(BufferedImage image, Dimension viewSize, Point relativeAnchorLocation, MotionPanelView motionPanelView, boolean isCircular) {
         BufferedImage resized = Utils.toBufferedImage(image.getScaledInstance(viewSize.width, viewSize.height, Image.SCALE_SMOOTH));

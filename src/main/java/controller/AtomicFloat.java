@@ -1,6 +1,10 @@
 package controller;
+
 import java.util.concurrent.atomic.AtomicInteger;
-import static java.lang.Float.*;
+
+import static java.lang.Float.floatToIntBits;
+import static java.lang.Float.intBitsToFloat;
+
 public class AtomicFloat extends Number {
 
     private final AtomicInteger bits;
@@ -16,9 +20,10 @@ public class AtomicFloat extends Number {
     public final float get() {
         return intBitsToFloat(bits.get());
     }
+
     @SuppressWarnings("UnusedReturnValue")
-    public float addAndGet(float delta){
-        set(get()+delta);
+    public float addAndGet(float delta) {
+        set(get() + delta);
         return get();
     }
 

@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import static controller.UserInterfaceController.*;
 import static controller.constants.AbilityConstants.*;
 import static controller.constants.EntityConstants.SKILL_COOLDOWN_IN_MINUTES;
-import static controller.constants.Variables.EPSILON_RADIUS;
 
 public enum Skill {
     Ares, Astrape, Cerberus,
@@ -26,7 +25,8 @@ public enum Skill {
     public static void initializeSkills() {
         setActiveSkill(findSkill(Profile.getCurrent().getActiveSkillSaveName()));
         CopyOnWriteArrayList<Skill> acquiredSkillSave = new CopyOnWriteArrayList<>();
-        for (String skillName : Profile.getCurrent().getAcquiredSkillsNames()) acquiredSkillSave.add(findSkill(skillName));
+        for (String skillName : Profile.getCurrent().getAcquiredSkillsNames())
+            acquiredSkillSave.add(findSkill(skillName));
         for (Skill skill : acquiredSkillSave) skill.setAcquired(true);
     }
 
@@ -69,12 +69,9 @@ public enum Skill {
     public ActionListener getAction() {
         return switch (this) {
 
-            case ARES -> e -> {
+            case Ares -> e -> {
                 Profile.getCurrent().setEpsilonMeleeDamage((int) (Profile.getCurrent().getEpsilonMeleeDamage() + WRIT_OF_ARES_BUFF_AMOUNT.getValue()));
                 Profile.getCurrent().setEpsilonRangedDamage((int) (Profile.getCurrent().getEpsilonRangedDamage() + WRIT_OF_ARES_BUFF_AMOUNT.getValue()));
-            case Ares -> e -> {
-                Profile.getCurrent().EPSILON_MELEE_DAMAGE += (int) WRIT_OF_ARES_BUFF_AMOUNT.getValue();
-                Profile.getCurrent().EPSILON_RANGED_DAMAGE += (int) WRIT_OF_ARES_BUFF_AMOUNT.getValue();
             };
             case Astrape -> e -> {
                 //todo collision -> -2hp
@@ -85,7 +82,8 @@ public enum Skill {
             case Aceso -> e -> {
                 Timer healthTimer = new Timer((int) WRIT_OF_ACESO_HEALING_FREQUENCY.getValue(), null);
                 healthTimer.addActionListener(e1 -> {
-                    if (isGameRunning()) EpsilonModel.getINSTANCE().addHealth((int) WRIT_OF_ACESO_HEALING_AMOUNT.getValue());
+                    if (isGameRunning())
+                        EpsilonModel.getINSTANCE().addHealth((int) WRIT_OF_ACESO_HEALING_AMOUNT.getValue());
                     if (!isGameOn()) healthTimer.stop();
                 });
                 healthTimer.start();
@@ -99,7 +97,7 @@ public enum Skill {
             case Proteus -> e -> EpsilonModel.getINSTANCE().addVertex();
             case Empusa -> e -> {
                 //todo this line those not work
-                EPSILON_RADIUS = (int) ((1-0.1) * EPSILON_RADIUS);
+                //EPSILON_RADIUS = (int) ((1-0.1) * EPSILON_RADIUS);
             };
             case Dolus -> e -> {
                 //todo 2 skill random

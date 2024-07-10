@@ -18,7 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static controller.UserInterfaceController.*;
 import static controller.constants.ViewConstants.BASE_PAINT_OPACITY;
-import static model.MotionPanelModel.*;
+import static model.MotionPanelModel.allMotionPanelModelsList;
+import static model.MotionPanelModel.getMainMotionPanelModel;
 import static model.characters.GeoShapeModel.allShapeModelsList;
 import static view.containers.GlassFrame.getGlassFrame;
 import static view.containers.MotionPanelView.allMotionPanelViewsList;
@@ -42,7 +43,7 @@ public final class GameLoop implements Runnable {
             int[] properties = getMotionPanelProperties(motionPanelView.getViewId());
             motionPanelView.setBounds(properties[0], properties[1], properties[2], properties[3]);
             for (GeoShapeView shapeView : motionPanelView.shapeViews) {
-                shapeView.getRotatedIcon().setOpacity(BASE_PAINT_OPACITY.getValue() + getHealthScale(shapeView.getViewId())*(1- BASE_PAINT_OPACITY.getValue()));
+                shapeView.getRotatedIcon().setOpacity(BASE_PAINT_OPACITY.getValue() + getHealthScale(shapeView.getViewId()) * (1 - BASE_PAINT_OPACITY.getValue()));
                 shapeView.setVertexLocations(getGeoShapeVertices(shapeView.getViewId()));
             }
         }
@@ -70,6 +71,11 @@ public final class GameLoop implements Runnable {
         return INSTANCE;
     }
 
+    public static String getFpsUps() {
+        if (INSTANCE != null && getINSTANCE().isOn() && getINSTANCE().isRunning()) return getINSTANCE().fpsUps;
+        return "";
+    }
+
     @Override
     public void run() {
         running.set(true);
@@ -88,11 +94,12 @@ public final class GameLoop implements Runnable {
         while (!exit.get()) {
             if (running.get()) {
                 currentTime = System.nanoTime();
-                gameLoopCycle(frames,ticks,deltaF,deltaU,timePerFrame,timePerUpdate);
+                gameLoopCycle(frames, ticks, deltaF, deltaU, timePerFrame, timePerUpdate);
             }
         }
     }
-    public void gameLoopCycle(AtomicInteger frames,AtomicInteger ticks, AtomicFloat deltaF,AtomicFloat deltaU, float timePerFrame, float timePerUpdate){
+
+    public void gameLoopCycle(AtomicInteger frames, AtomicInteger ticks, AtomicFloat deltaF, AtomicFloat deltaU, float timePerFrame, float timePerUpdate) {
         if (deltaU.get() >= 1) {
             updateModel();
             ticks.addAndGet(1);
@@ -116,7 +123,7 @@ public final class GameLoop implements Runnable {
             lastUpdateTime = currentTime;
         }
         if (currentTime - timeSave >= TimeUnit.SECONDS.toNanos(1)) {
-            fpsUps = "<html>FPS: " + frames + " <br/>UPS:" + ticks+"</html>";
+            fpsUps = "<html>FPS: " + frames + " <br/>UPS:" + ticks + "</html>";
             frames.set(0);
             ticks.set(0);
             timeSave = currentTime;
@@ -138,18 +145,18 @@ public final class GameLoop implements Runnable {
 
     public void toggleGameLoop() {
         if (getMainMotionPanelView() == null || !getMainMotionPanelView().isVisible()) {
-            Thread thread=new Thread(this);
+            Thread thread = new Thread(this);
             thread.setDaemon(true);
             thread.start();
-        }
-        else {
+        } else {
             if (running.get()) {
                 long now = System.nanoTime();
                 updateTimeDiffCapture = now - lastUpdateTime;
                 frameTimeDiffCapture = now - lastFrameTime;
                 timeSaveDiffCapture = now - timeSave;
                 UserInputHandler.getINSTANCE().setShootTimeDiffCapture(now - UserInputHandler.getINSTANCE().getLastShootingTime());
-                for (Movable movable: Movable.movables) movable.setPositionUpdateTimeDiffCapture(now - movable.getLastPositionUpdateTime());
+                for (Movable movable : Movable.movables)
+                    movable.setPositionUpdateTimeDiffCapture(now - movable.getLastPositionUpdateTime());
             }
             if (!running.get()) {
                 currentTime = System.nanoTime();
@@ -157,20 +164,22 @@ public final class GameLoop implements Runnable {
                 lastFrameTime = currentTime - frameTimeDiffCapture;
                 timeSave = currentTime - timeSaveDiffCapture;
                 UserInputHandler.getINSTANCE().setLastShootingTime(currentTime - UserInputHandler.getINSTANCE().getShootTimeDiffCapture());
-                for (Movable movable: Movable.movables) movable.setLastPositionUpdateTime(currentTime - movable.getPositionUpdateTimeDiffCapture());
+                for (Movable movable : Movable.movables)
+                    movable.setLastPositionUpdateTime(currentTime - movable.getPositionUpdateTimeDiffCapture());
             }
         }
         running.set(!running.get());
     }
 
-    public boolean isRunning() {return running.get();}
+    public boolean isRunning() {
+        return running.get();
+    }
+
+    public void setRunning(boolean running) {
+        this.running.set(running);
+    }
 
     public boolean isOn() {
         return !exit.get();
-    }
-    public void setRunning(boolean running){this.running.set(running);}
-    public static String getFpsUps(){
-        if (INSTANCE!=null && getINSTANCE().isOn() && getINSTANCE().isRunning()) return getINSTANCE().fpsUps;
-        return "";
     }
 }

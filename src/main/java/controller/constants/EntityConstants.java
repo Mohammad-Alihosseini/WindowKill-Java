@@ -52,8 +52,10 @@ public enum EntityConstants {
         public Point2D getValue() {
             return switch (this) {
 
-                case EPSILON_CENTER -> new Point2D.Float(EPSILON_DIMENSION.getValue().width / 2F, EPSILON_DIMENSION.getValue().height / 2F);
-                case BULLET_CENTER -> new Point2D.Float(BULLET_DIMENSION.getValue().width / 2F, BULLET_DIMENSION.getValue().height / 2F);
+                case EPSILON_CENTER ->
+                        new Point2D.Float(EPSILON_DIMENSION.getValue().width / 2F, EPSILON_DIMENSION.getValue().height / 2F);
+                case BULLET_CENTER ->
+                        new Point2D.Float(BULLET_DIMENSION.getValue().width / 2F, BULLET_DIMENSION.getValue().height / 2F);
             };
         }
     }

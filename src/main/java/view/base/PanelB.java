@@ -1,4 +1,4 @@
-package view.containers;
+package view.base;
 
 import view.Utils;
 
@@ -14,11 +14,11 @@ import static view.Utils.*;
 import static view.containers.GlassFrame.getGlassFrame;
 
 public class PanelB extends JPanel {
-    private static final boolean BACKGROUND_RESIZE=false;
-    private static final BufferedImage defaultImage=toBufferedImage(MENU_BACKGROUND_PATH.getValue());
+    private static final boolean BACKGROUND_RESIZE = false;
+    private static final BufferedImage defaultImage = toBufferedImage(MENU_BACKGROUND_PATH.getValue());
+    private final GridBagConstraints constraints = new GridBagConstraints();
     transient BufferedImage imageSave;
     transient BufferedImage currentImage;
-    private final GridBagConstraints constraints = new GridBagConstraints();
 
     public PanelB(Dimension dimension) {
         this(dimension, defaultImage);
@@ -81,21 +81,23 @@ public class PanelB extends JPanel {
         setVisible(!isVisible());
     }
 
-    public void setImage(BufferedImage image){
+    public void setImage(BufferedImage image) {
         this.imageSave = bufferedImageClone(image);
         this.currentImage = bufferedImageClone(image);
     }
 
     @Override
     public void setSize(int width, int height) {
-        if (imageSave != null && BACKGROUND_RESIZE) currentImage = Utils.toBufferedImage(imageSave.getScaledInstance(width, height, Image.SCALE_SMOOTH));
-        setBounds((SCREEN_SIZE.getValue().width - width) / 2, (SCREEN_SIZE.getValue().height - height) / 2,width,height);
+        if (imageSave != null && BACKGROUND_RESIZE)
+            currentImage = Utils.toBufferedImage(imageSave.getScaledInstance(width, height, Image.SCALE_SMOOTH));
+        setBounds((SCREEN_SIZE.getValue().width - width) / 2, (SCREEN_SIZE.getValue().height - height) / 2, width, height);
     }
 
     @Override
     public void setBounds(int x, int y, int width, int height) {
         super.setBounds(x, y, width, height);
-        if (imageSave!=null && !BACKGROUND_RESIZE) currentImage=cropImage(new Point(x,y),new Dimension(width,height),imageSave,BACKGROUND_RESIZE);
+        if (imageSave != null && !BACKGROUND_RESIZE)
+            currentImage = cropImage(new Point(x, y), new Dimension(width, height), imageSave, BACKGROUND_RESIZE);
     }
 
     public GridBagConstraints getConstraints() {

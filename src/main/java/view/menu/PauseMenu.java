@@ -2,9 +2,9 @@ package view.menu;
 
 import controller.constants.DefaultMethods;
 import model.Profile;
-import view.containers.ButtonB;
-import view.containers.PanelB;
-import view.containers.SliderB;
+import view.base.ButtonB;
+import view.base.PanelB;
+import view.base.SliderB;
 import view.containers.TopElement;
 
 import javax.swing.*;
@@ -24,7 +24,7 @@ import static view.containers.GlassFrame.getGlassFrame;
 public class PauseMenu extends PanelB implements TopElement {
     static CopyOnWriteArrayList<Component> abilities = new CopyOnWriteArrayList<>();
     private static PauseMenu INSTANCE;
-    private static boolean pauseAccess=true;
+    private static boolean pauseAccess = true;
 
     private PauseMenu() {
         super(PAUSE_MENU_DIMENSION.getValue());
@@ -50,7 +50,7 @@ public class PauseMenu extends PanelB implements TopElement {
                 MainMenu.getINSTANCE().togglePanel();
             }
         });
-        
+
         getConstraints().gridwidth = 2;
         add(xp, false, true);
         add(resume, false, true);
@@ -65,10 +65,11 @@ public class PauseMenu extends PanelB implements TopElement {
         getConstraints().gridwidth = 2;
         add(exit, false, true);
     }
-    public static void setupAbilityButtons(){
+
+    public static void setupAbilityButtons() {
         ConcurrentMap<String, Integer> abilitiesData = getAbilitiesData();
-        for (Map.Entry<String,Integer> abilityData : abilitiesData.entrySet()) {
-            JButton abilityButton=new ButtonB(ButtonB.ButtonType.UNACQUIRED_SKILL, abilityData.getKey(), (int) SKILL_BUTTON_WIDTH.getValue(), ABILITY_FONT_SIZE_SCALE.getValue(), false, false);
+        for (Map.Entry<String, Integer> abilityData : abilitiesData.entrySet()) {
+            JButton abilityButton = new ButtonB(ButtonB.ButtonType.UNACQUIRED_SKILL, abilityData.getKey(), (int) SKILL_BUTTON_WIDTH.getValue(), ABILITY_FONT_SIZE_SCALE.getValue(), false, false);
             abilityButton.addActionListener(e -> {
                 int action = JOptionPane.showConfirmDialog(getINSTANCE(), ABILITY_ACTIVATE_MESSAGE(abilityData.getValue()), ABILITY_ACTIVATION_CONFIRMATION.getValue(), JOptionPane.YES_NO_OPTION);
                 if (action == JOptionPane.YES_OPTION) {
@@ -89,7 +90,7 @@ public class PauseMenu extends PanelB implements TopElement {
     }
 
     public static PauseMenu getINSTANCE() {
-        if (INSTANCE==null || !INSTANCE.isVisible()) INSTANCE=new PauseMenu();
+        if (INSTANCE == null || !INSTANCE.isVisible()) INSTANCE = new PauseMenu();
         return INSTANCE;
     }
 
@@ -101,6 +102,7 @@ public class PauseMenu extends PanelB implements TopElement {
     public void togglePanel() {
         togglePanel(false);
     }
+
     public void togglePanel(boolean exit) {
         if (!exit && pauseAccess) {
             super.togglePanel();

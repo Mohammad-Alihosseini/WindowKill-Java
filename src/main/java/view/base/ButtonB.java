@@ -1,8 +1,9 @@
-package view.containers;
+package view.base;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import static controller.constants.FilePaths.UI_ELEMENTS_PATH;
@@ -11,10 +12,10 @@ import static view.Utils.toBufferedImage;
 import static view.containers.GlassFrame.getGlassFrame;
 
 public class ButtonB extends JButton {
-    private Font plainFont = ORBITRON_FONT.deriveFont(Font.PLAIN, PLAIN_FONT_SIZE.getValue());
-    private Font boldFont = ORBITRON_FONT.deriveFont(Font.BOLD, BOLD_FONT_SIZE.getValue());
     boolean dummyButton;
     boolean alignToRight;
+    private Font plainFont = ORBITRON_FONT.deriveFont(Font.PLAIN, PLAIN_FONT_SIZE.getValue());
+    private Font boldFont = ORBITRON_FONT.deriveFont(Font.BOLD, BOLD_FONT_SIZE.getValue());
 
     public ButtonB(ButtonType type, String text, int desiredWidth, float fontSizeScale, boolean alignToRight) {
         this(type, text, desiredWidth, fontSizeScale, alignToRight, false);
@@ -35,7 +36,7 @@ public class ButtonB extends JButton {
         }
 
         String imagePath = UI_ELEMENTS_PATH.getValue() + type.name() + ".png";
-        BufferedImage image=toBufferedImage(imagePath);
+        BufferedImage image = toBufferedImage(imagePath);
         float scale = (float) desiredWidth / image.getWidth();
         Dimension desiredDimension = new Dimension((int) (image.getWidth() * scale), (int) (image.getHeight() * scale));
         BufferedImage resized = toBufferedImage(image.getScaledInstance(desiredDimension.width, desiredDimension.height, Image.SCALE_SMOOTH));
@@ -81,10 +82,14 @@ public class ButtonB extends JButton {
 
     public String alignToRight(String text) {
         String out = text;
-        while ((float) getGlassFrame().getGraphics().getFontMetrics(getFont()).stringWidth(out) / getPreferredSize().width < TEXT_SCALE.getValue()) out = " " + out;
+        while ((float) getGlassFrame().getGraphics().getFontMetrics(getFont()).stringWidth(out) / getPreferredSize().width < TEXT_SCALE.getValue())
+            out = " " + out;
         return out;
     }
-    public void toggleBold(){setFont(getFont().equals(plainFont) ? boldFont : plainFont);}
+
+    public void toggleBold() {
+        setFont(getFont().equals(plainFont) ? boldFont : plainFont);
+    }
 
     public enum ButtonType {
         MENU_BUTTON, SMALL_MENU_BUTTON, SMALL_FIELD_BUTTON, TYPE0, TYPE1, TYPE2, TYPE3, ACQUIRED_SKILL, UNACQUIRED_SKILL, ACTIVE_SKILL

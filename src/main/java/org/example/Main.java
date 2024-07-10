@@ -20,7 +20,10 @@ public class Main {
                 Runtime.getRuntime().addShutdownHook(new Thread(UserInterfaceController::safeExitApplication, "Shutdown-thread"));
                 UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
                 UIManager.getLookAndFeelDefaults().put("defaultFont", ORBITRON_FONT.deriveFont(DEFAULT_FONT_SIZE.getValue()));
-            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {throw new AWTError("Failed to set AWT settings");}
+            } catch (ClassNotFoundException | InstantiationException | IllegalAccessException |
+                     UnsupportedLookAndFeelException e) {
+                throw new AWTError("Failed to set AWT settings");
+            }
             getGlassFrame();
             LoginPage.getINSTANCE().togglePanel();
         });

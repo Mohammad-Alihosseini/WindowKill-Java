@@ -3,8 +3,8 @@ package model.characters;
 import model.collision.Collidable;
 import model.entities.Entity;
 import model.movement.Movable;
-import model.movement.Translatable;
 import model.movement.Movement;
+import model.movement.Translatable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -22,12 +22,12 @@ import static model.Utils.*;
 
 public class GeoShapeModel extends Entity implements Collidable, Translatable, Movable {
     public static final List<GeoShapeModel> allShapeModelsList = new CopyOnWriteArrayList<>();
-    private boolean isCircular;
     public final String modelId;
-    private Point2D anchorSave;
-    private final List<Point2D> vertices=new CopyOnWriteArrayList<>();
-    private final List<Point2D> verticesSave=new CopyOnWriteArrayList<>();
+    private final List<Point2D> vertices = new CopyOnWriteArrayList<>();
+    private final List<Point2D> verticesSave = new CopyOnWriteArrayList<>();
     private final Movement movement;
+    private boolean isCircular;
+    private Point2D anchorSave;
     private String motionPanelId;
     private float totalRotation = 0;
     private Geometry geometry;
@@ -36,7 +36,7 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
         setVerticesSave(vertices);
         this.setFullHealth(health);
         this.setHealth(health);
-        this.modelId=UUID.randomUUID().toString();
+        this.modelId = UUID.randomUUID().toString();
         setVulnerable(true);
         movement = new Movement(getModelId(), anchor);
         allShapeModelsList.add(this);
@@ -72,7 +72,8 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
 
     @Override
     public void moveShapeModel(Point2D newAnchor) {
-        for (int i = 0; i < verticesSave.size(); i++) getVertices().set(i, addUpPoints(verticesSave.get(i), relativeLocation(newAnchor, getAnchorSave())));
+        for (int i = 0; i < verticesSave.size(); i++)
+            getVertices().set(i, addUpPoints(verticesSave.get(i), relativeLocation(newAnchor, getAnchorSave())));
         moveGeoShape(getModelId(), movement.getAnchor());
     }
 
@@ -103,6 +104,10 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
     @Override
     public boolean isCircular() {
         return isCircular;
+    }
+
+    public void setCircular(boolean circular) {
+        isCircular = circular;
     }
 
     @Override
@@ -162,7 +167,9 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
     }
 
     @Override
-    public String getModelId() {return modelId;}
+    public String getModelId() {
+        return modelId;
+    }
 
     @Override
     public String getMotionPanelId() {
@@ -171,10 +178,6 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
 
     public void setMotionPanelId(String motionPanelId) {
         this.motionPanelId = motionPanelId;
-    }
-
-    public void setCircular(boolean circular) {
-        isCircular = circular;
     }
 
     public Point2D getAnchorSave() {

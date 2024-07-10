@@ -4,7 +4,8 @@ import java.awt.event.ActionListener;
 
 public abstract class TypedActionListener implements ActionListener {
     private final ActionListenerType type;
-    private Side side=null;
+    private Side side = null;
+
     protected TypedActionListener(ActionListenerType type) {
         this.type = type;
     }
@@ -27,5 +28,6 @@ public abstract class TypedActionListener implements ActionListener {
     }
 
     public enum ActionListenerType {SHRINK, MOVE, ROTATE, DECELERATE, IMPACT}
+
     public enum Side {LEFT, RIGHT, TOP, BOTTOM, CENTER}
 }

@@ -33,10 +33,11 @@ public enum Ability {
     public ActionListener getAction() {
         return switch (this) {
 
-            case HEPHAESTUS -> e -> emitImpactWave(EpsilonModel.getINSTANCE().getAnchor(), HEPHAESTUS_ABILITY_WAVE_POWER.getValue());
+            case HEPHAESTUS ->
+                    e -> emitImpactWave(EpsilonModel.getINSTANCE().getAnchor(), HEPHAESTUS_ABILITY_WAVE_POWER.getValue());
             case ATHENA -> e -> {
                 EpsilonModel.getINSTANCE().setShootingRapidity((int) ATHENA_ABILITY_SHOOTING_RAPIDITY.getValue());
-                Timer timer=new Timer((int) ATHENA_ABILITY_TIME.getValue(), e1 -> EpsilonModel.getINSTANCE().setShootingRapidity(EPSILON_SHOOTING_RAPIDITY.getValue()));
+                Timer timer = new Timer((int) ATHENA_ABILITY_TIME.getValue(), e1 -> EpsilonModel.getINSTANCE().setShootingRapidity(EPSILON_SHOOTING_RAPIDITY.getValue()));
                 timer.setRepeats(false);
                 timer.start();
             };

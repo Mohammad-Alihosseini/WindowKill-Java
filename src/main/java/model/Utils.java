@@ -13,7 +13,9 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Utils {
-    private Utils(){}
+    private Utils() {
+    }
+
     public static boolean areInstancesOf(Object object1, Object object2, Class<?> class1, Class<?> class2) {
         return (class1.isInstance(object1) && class2.isInstance(object2)) || (class2.isInstance(object1) && class1.isInstance(object2));
     }
@@ -41,13 +43,19 @@ public class Utils {
     @SuppressWarnings("unchecked")
     public static <T> T deepClone(T t) {
         Method cloneMethod;
-        try {cloneMethod = t.getClass().getMethod("clone");}
-        catch (NoSuchMethodException e) {return null;}
+        try {
+            cloneMethod = t.getClass().getMethod("clone");
+        } catch (NoSuchMethodException e) {
+            return null;
+        }
 
         if (Modifier.isPublic(cloneMethod.getModifiers())) {
             Object cloned;
-            try {cloned = cloneMethod.invoke(t);}
-            catch (IllegalAccessException | InvocationTargetException e) {throw new UnsupportedOperationException("Failed to clone instance of class: "+t.getClass().getName());}
+            try {
+                cloned = cloneMethod.invoke(t);
+            } catch (IllegalAccessException | InvocationTargetException e) {
+                throw new UnsupportedOperationException("Failed to clone instance of class: " + t.getClass().getName());
+            }
             return (T) cloned;
         }
         return null;
@@ -152,5 +160,7 @@ public class Utils {
         return new Coordinate(point2D.getX(), point2D.getY());
     }
 
-    public static float validateAngle(float angle){return (float) (angle - Math.floor(angle / 360) * 360);}
+    public static float validateAngle(float angle) {
+        return (float) (angle - Math.floor(angle / 360) * 360);
+    }
 }

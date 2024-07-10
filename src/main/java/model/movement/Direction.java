@@ -5,7 +5,8 @@ import controller.constants.DefaultMethods;
 import java.awt.geom.Point2D;
 
 import static controller.constants.ImpactConstants.DIRECTION_SENSITIVITY;
-import static model.Utils.*;
+import static model.Utils.multiplyPoint;
+import static model.Utils.validateAngle;
 
 public class Direction {
     private final float directionSlope;
@@ -40,7 +41,8 @@ public class Direction {
     public Direction(float angle) {
         this(new Direction(new Point2D.Float((float) DefaultMethods.cosTable[(int) validateAngle(angle)], (float) DefaultMethods.sinTable[(int) validateAngle(angle)])));
     }
-    public Direction(Direction orientation){
+
+    public Direction(Direction orientation) {
         this.isUpside = orientation.isUpside;
         this.isDownside = orientation.isDownside;
         this.orientation = orientation.orientation;
@@ -53,8 +55,10 @@ public class Direction {
         if (isUpside) return new Point2D.Float(0, 1);
 
         float normalScale = (float) Math.sqrt(1 / (1 + directionSlope * directionSlope));
-        if (orientation == DirectionOrientation.POSITIVE) return multiplyPoint(new Point2D.Float(1, directionSlope), normalScale);
-        if (orientation == DirectionOrientation.NEGATIVE) return multiplyPoint(new Point2D.Float(-1, -directionSlope), normalScale);
+        if (orientation == DirectionOrientation.POSITIVE)
+            return multiplyPoint(new Point2D.Float(1, directionSlope), normalScale);
+        if (orientation == DirectionOrientation.NEGATIVE)
+            return multiplyPoint(new Point2D.Float(-1, -directionSlope), normalScale);
         return null;
     }
 
@@ -70,7 +74,7 @@ public class Direction {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Direction direction1)) return false;
-        return directionSlope==direction1.directionSlope && isUpside==direction1.isUpside && isDownside==direction1.isDownside && orientation.equals(direction1.orientation);
+        return directionSlope == direction1.directionSlope && isUpside == direction1.isUpside && isDownside == direction1.isDownside && orientation.equals(direction1.orientation);
     }
 
     @Override

@@ -14,14 +14,15 @@ public enum UIConstants {
     MENU_BUTTON_WIDTH, TEXT_SCALE, SLIDER_PRECISION_SCALE, MESSAGE_FADE_INTERVAL, MESSAGE_HEIGHT, MESSAGE_FONT_SIZE, DEFAULT_FONT_SIZE,
     BACK_BUTTON_WIDTH, BACK_BUTTON_FONT_SCALE, SKILL_BUTTON_WIDTH, SKILL_FONT_SIZE_SCALE, ABILITY_FONT_SIZE_SCALE, SKILL_TEXT_OFFSET,
     SLIDER_MINOR_SPACINGS_NUMBER, SLIDER_MAJOR_SPACINGS_NUMBER, SLIDER_LABEL_WIDTH, SLIDER_LABEL_FONT_SIZE, MINIMUM_PROFILE_ID_LENGTH,
-    FPS_COUNTER_FONT_SIZE,FPS_COUNTER_OPACITY;
+    FPS_COUNTER_FONT_SIZE, FPS_COUNTER_OPACITY;
 
     public static final Color BLOOD_RED = new Color(138, 3, 3);
     public static final Color SCI_FI_BLUE = new Color(52, 220, 240);
-    public static final Color SCI_FI_DARK_BLUE=new Color(0,13,16);
+    public static final Color SCI_FI_DARK_BLUE = new Color(0, 13, 16);
 
     public static final Font ORBITRON_FONT;
     public static final Font MANTINIA_FONT;
+
     static {
         try {
             ORBITRON_FONT = Font.createFont(Font.TRUETYPE_FONT, new File(ORBITRON_FONT_PATH.getValue()));
@@ -29,7 +30,9 @@ public enum UIConstants {
             GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             ge.registerFont(ORBITRON_FONT);
             ge.registerFont(MANTINIA_FONT);
-        } catch (FontFormatException | IOException e) {throw new UnsupportedOperationException("Failed to initialize fonts");}
+        } catch (FontFormatException | IOException e) {
+            throw new UnsupportedOperationException("Failed to initialize fonts");
+        }
     }
 
     public float getValue() {
@@ -39,7 +42,7 @@ public enum UIConstants {
             case MIN_GAME_SPEED -> 1;
             case MAX_VOLUME -> 8;
             case MIN_VOLUME -> 0; //All preset volumes shall be less than 2/MAX_VOLUME (currently 0.25)
-            case PLAIN_FONT_SIZE -> 32*Profile.getCurrent().getSizeScale();
+            case PLAIN_FONT_SIZE -> 32 * Profile.getCurrent().getSizeScale();
             case BOLD_FONT_SIZE -> 1.05f * PLAIN_FONT_SIZE.getValue();
             case LOGIN_PAGE_FONT_SIZE -> 0.55f;
             case LOGIN_PAGE_ID_FIELD_FONT_SIZE -> 50f;

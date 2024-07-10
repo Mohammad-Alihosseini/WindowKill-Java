@@ -14,12 +14,10 @@ import static view.Utils.averageTone;
 import static view.characters.GeoShapeView.getRawImage;
 
 public class DefaultMethods {
-    private DefaultMethods() {}
-
     //SIN,COS PRE-PROCESSING//
     public static final double[] sinTable = new double[360];
     public static final double[] cosTable = new double[360];
-    public static  final double[] radianTable = new double[360];
+    public static final double[] radianTable = new double[360];
 
     static {
         for (int i = 0; i < 360; i++) {
@@ -28,6 +26,9 @@ public class DefaultMethods {
             DefaultMethods.cosTable[i] = Math.cos(radian);
             DefaultMethods.radianTable[i] = radian;
         }
+    }
+
+    private DefaultMethods() {
     }
 
     public static float getCenterOffset(float radius) {
@@ -46,8 +47,10 @@ public class DefaultMethods {
 
     public static Color GET_AVERAGE_TONE_OF_CHARACTER(GeoShapeView geoShapeView) {
         Color color;
-        if (geoShapeView.getClass().equals(SquarantineView.class)) color = averageTone(getRawImage(SQUARANTINE_IMAGEPATH.getValue()));
-        else if (geoShapeView.getClass().equals(TrigorathView.class)) color = averageTone(getRawImage(TRIGORATH_IMAGEPATH.getValue()));
+        if (geoShapeView.getClass().equals(SquarantineView.class))
+            color = averageTone(getRawImage(SQUARANTINE_IMAGEPATH.getValue()));
+        else if (geoShapeView.getClass().equals(TrigorathView.class))
+            color = averageTone(getRawImage(TRIGORATH_IMAGEPATH.getValue()));
         else color = new Color(0, 0, 0, 0);
         return color;
     }

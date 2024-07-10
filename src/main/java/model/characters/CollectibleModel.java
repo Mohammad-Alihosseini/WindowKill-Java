@@ -29,7 +29,7 @@ public class CollectibleModel extends GeoShapeModel {
         Point2D spawnLocation = addUpPoints(geoShapeModel.getAnchor(), multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(), random.nextFloat(0, geoShapeModel.getRadius())));
         moveShapeModel(spawnLocation);
         getMovement().setAnchor(spawnLocation);
-        Timer timer=new Timer((int) TimeUnit.SECONDS.toMillis(COLLECTIBLE_LIFE_TIME.getValue()), e -> eliminate());
+        Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(COLLECTIBLE_LIFE_TIME.getValue()), e -> eliminate());
         timer.setCoalesce(true);
         timer.setRepeats(false);
         timer.start();

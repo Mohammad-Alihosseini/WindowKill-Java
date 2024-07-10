@@ -18,8 +18,11 @@ public final class GlassFrame extends JFrame {
 
     private GlassFrame() throws HeadlessException {
         super();
-        try {minimizeAll();}
-        catch (AWTException e) {throw new UnsupportedOperationException("Failed to minimize");}
+        try {
+            minimizeAll();
+        } catch (AWTException e) {
+            throw new UnsupportedOperationException("Failed to minimize");
+        }
         setUndecorated(true);
         setBackground(new Color(1, 0, 0, 1));
         setSize(SCREEN_SIZE.getValue().width, SCREEN_SIZE.getValue().height);
@@ -41,23 +44,23 @@ public final class GlassFrame extends JFrame {
         r.keyRelease(KeyEvent.VK_WINDOWS);
     }
 
+    public static GlassFrame getGlassFrame() {
+        if (INSTANCE == null) INSTANCE = new GlassFrame();
+        return INSTANCE;
+    }
+
     public void setupFpsCounter() {
-        JLabel fpsCounter=new JLabel();
-        fpsCounter.setFont(MANTINIA_FONT.deriveFont(Font.BOLD,FPS_COUNTER_FONT_SIZE.getValue()));
+        JLabel fpsCounter = new JLabel();
+        fpsCounter.setFont(MANTINIA_FONT.deriveFont(Font.BOLD, FPS_COUNTER_FONT_SIZE.getValue()));
         fpsCounter.setForeground(BLOOD_RED);
-        fpsCounter.setLocation(10,50);
+        fpsCounter.setLocation(10, 50);
         fpsCounter.setSize(FPS_COUNTER_DIMENSION.getValue());
         fpsCounter.setBackground(changeColorOpacity(SCI_FI_DARK_BLUE, FPS_COUNTER_OPACITY.getValue()));
         fpsCounter.setOpaque(true);
-        new Timer(10,e -> {
+        new Timer(10, e -> {
             fpsCounter.setText(UserInterfaceController.getFpsUps());
             fpsCounter.setVisible(!fpsCounter.getText().isEmpty());
         }).start();
         add(fpsCounter);
-    }
-
-    public static GlassFrame getGlassFrame() {
-        if (INSTANCE == null) INSTANCE = new GlassFrame();
-        return INSTANCE;
     }
 }

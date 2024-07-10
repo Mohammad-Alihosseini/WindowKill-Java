@@ -57,7 +57,7 @@ public final class EpsilonModel extends GeoShapeModel implements LongRanged {
     @Override
     public void eliminate() {
         super.eliminate();
-        Timer timer=new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) showMessage(-1)), e -> {
+        Timer timer = new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) showMessage(-1)), e -> {
             exitGame();
             MainMenu.flushINSTANCE();
             MainMenu.getINSTANCE().togglePanel();
@@ -74,7 +74,7 @@ public final class EpsilonModel extends GeoShapeModel implements LongRanged {
         getMovement().getMoveListeners().clear();
         getMovement().getMoveListeners().add(e -> {
 
-            Direction downDirection=new Direction(0, Direction.DirectionOrientation.POSITIVE);
+            Direction downDirection = new Direction(0, Direction.DirectionOrientation.POSITIVE);
             downDirection.setDownside(true);
             getMovement().setDirection(downDirection);
 
@@ -87,7 +87,7 @@ public final class EpsilonModel extends GeoShapeModel implements LongRanged {
                 getMovement().decelerate(new Direction(getMovement().getDirection()));
             }
 
-            Direction upDirection=new Direction(0, Direction.DirectionOrientation.POSITIVE);
+            Direction upDirection = new Direction(0, Direction.DirectionOrientation.POSITIVE);
             upDirection.setUpside(true);
             getMovement().setDirection(upDirection);
 

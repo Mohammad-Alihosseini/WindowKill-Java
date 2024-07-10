@@ -10,10 +10,10 @@ public enum FilePaths {
         return switch (this) {
 
             case UI_ELEMENTS_PATH -> "./src/main/resources/ui elements/";
-            case SLIDER_UI_PATH -> UI_ELEMENTS_PATH.getValue()+"SLIDER.png";
-            case ICON_PATH -> UI_ELEMENTS_PATH.getValue()+"ICON.png";
-            case MENU_BACKGROUND_PATH -> UI_ELEMENTS_PATH.getValue()+"MENU.png";
-            case GAME_BACKGROUND_PATH -> UI_ELEMENTS_PATH.getValue()+"LOADING_BACKGROUND.png";
+            case SLIDER_UI_PATH -> UI_ELEMENTS_PATH.getValue() + "SLIDER.png";
+            case ICON_PATH -> UI_ELEMENTS_PATH.getValue() + "ICON.png";
+            case MENU_BACKGROUND_PATH -> UI_ELEMENTS_PATH.getValue() + "MENU.png";
+            case GAME_BACKGROUND_PATH -> UI_ELEMENTS_PATH.getValue() + "LOADING_BACKGROUND.png";
             case ORBITRON_FONT_PATH -> "./src/main/resources/fonts/Orbitron.ttf";
             case MANTINIA_FONT_PATH -> "./src/main/resources/fonts/Mantinia.otf";
             case GAME_THEME_PATH -> "./src/main/resources/effects/backgrounds/BG0.ogg";

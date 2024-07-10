@@ -65,32 +65,39 @@ public interface Collidable {
     default MovementState.CollisionState checkCollision(Collidable collidable) {
         if (!collide(collidable) || !collidable.collide(this)) return null;
         Point2D collisionPoint;
-        if (isCircular() && collidable.isCircular()) collisionPoint=checkCircularCircularCollision(collidable);
-        else if (isCircular() && !collidable.isCircular()) collisionPoint=checkCircularNonCircularCollision(collidable);
+        if (isCircular() && collidable.isCircular()) collisionPoint = checkCircularCircularCollision(collidable);
+        else if (isCircular() && !collidable.isCircular())
+            collisionPoint = checkCircularNonCircularCollision(collidable);
         else if (!isCircular() && collidable.isCircular()) return collidable.checkCollision(this);
-        else collisionPoint=checkNonCircularNonCircularCollision(collidable);
+        else collisionPoint = checkNonCircularNonCircularCollision(collidable);
         return analyzeMotion(collidable, collisionPoint);
     }
-    default Point2D checkCircularCircularCollision(Collidable collidable){
+
+    default Point2D checkCircularCircularCollision(Collidable collidable) {
         if (getAnchor().distance(collidable.getAnchor()) <= (getRadius() + collidable.getRadius()) + COLLISION_SENSITIVITY.getValue()) {
             return weightedAddPoints(getAnchor(), collidable.getAnchor(), collidable.getRadius(), getRadius());
         } else return null;
     }
-    default Point2D checkCircularNonCircularCollision(Collidable collidable){
+
+    default Point2D checkCircularNonCircularCollision(Collidable collidable) {
         Coordinate closest = getClosestCoordinate(toCoordinate(getAnchor()), collidable.getGeometry());
-        if (closest.distance(toCoordinate(getAnchor())) <= getRadius() + COLLISION_SENSITIVITY.getValue()) return toPoint(closest);
+        if (closest.distance(toCoordinate(getAnchor())) <= getRadius() + COLLISION_SENSITIVITY.getValue())
+            return toPoint(closest);
         else return null;
     }
-    default Point2D checkNonCircularNonCircularCollision(Collidable collidable){
+
+    default Point2D checkNonCircularNonCircularCollision(Collidable collidable) {
         //Weird bug, probably due to runtime flow
-        if (getGeometry().getCoordinates().length==0 || collidable.getGeometry().getCoordinates().length==0) return null;
+        if (getGeometry().getCoordinates().length == 0 || collidable.getGeometry().getCoordinates().length == 0)
+            return null;
         Coordinate[] coordinates = DistanceOp.nearestPoints(getGeometry(), (collidable.getGeometry()));
         LineSegment segment = new LineSegment(coordinates[0], coordinates[1]);
         if (segment.getLength() <= COLLISION_SENSITIVITY.getValue()) return toPoint(segment.midPoint());
         else return null;
     }
+
     default MovementState.CollisionState analyzeMotion(Collidable collidable, Point2D collisionPoint) {
-        if (collisionPoint==null) return null;
+        if (collisionPoint == null) return null;
         Direction direction1 = new Direction(new Point2D.Float(0, 0));
         Direction direction2 = new Direction(new Point2D.Float(0, 0));
         float torque1 = 0;
@@ -115,9 +122,9 @@ public interface Collidable {
         torque1 = Math.abs(torque1) >= MAX_SAFE_ROTATION.getValue() ? (MAX_SAFE_ROTATION.getValue() * Math.signum(torque1)) : torque1;
         torque2 = Math.abs(torque2) >= MAX_SAFE_ROTATION.getValue() ? (MAX_SAFE_ROTATION.getValue() * Math.signum(torque2)) : torque2;
 
-        MovementState.CollidableMovementState stateOfCollidable1=new MovementState.CollidableMovementState(this,direction1,torque1,scale1);
-        MovementState.CollidableMovementState stateOfCollidable2=new MovementState.CollidableMovementState(collidable,direction2,torque2,scale2);
-        return new MovementState.CollisionState(collisionPoint,stateOfCollidable1,stateOfCollidable2);
+        MovementState.CollidableMovementState stateOfCollidable1 = new MovementState.CollidableMovementState(this, direction1, torque1, scale1);
+        MovementState.CollidableMovementState stateOfCollidable2 = new MovementState.CollidableMovementState(collidable, direction2, torque2, scale2);
+        return new MovementState.CollisionState(collisionPoint, stateOfCollidable1, stateOfCollidable2);
     }
 
     /**
@@ -144,7 +151,7 @@ public interface Collidable {
         Point2D.Float point2 = (Point2D.Float) relativeLocation(toPoint(surface.getCoordinate(0)), collisionPoint);
         float angle1 = calculateAngle(point1);
         float angle2 = calculateAngle(point2);
-        return (float) Math.abs(DefaultMethods.sinTable[(int) validateAngle(angle2-angle1)]);
+        return (float) Math.abs(DefaultMethods.sinTable[(int) validateAngle(angle2 - angle1)]);
     }
 
     /**
@@ -162,7 +169,8 @@ public interface Collidable {
         boolean movementSidesWithAnchor = dotProduct(tangentLineDirection, movementVector) > 0 == anchorSide;
         boolean collidableMovementSidesWithAnchor = dotProduct(tangentLineDirection, collidableMovementVector) > 0 == anchorSide;
         Direction out;
-        if (movementSidesWithAnchor && collidableMovementSidesWithAnchor) out = new Direction(addUpPoints(movementVector, collidableMovementVector));
+        if (movementSidesWithAnchor && collidableMovementSidesWithAnchor)
+            out = new Direction(addUpPoints(movementVector, collidableMovementVector));
         else if (!movementSidesWithAnchor) out = reflectToSurface(surface, collisionPoint);
         else out = new Direction(relativeLocation(getAnchor(), collisionPoint));
         return out;
@@ -200,7 +208,7 @@ public interface Collidable {
         LineSegment out;
         if (isCircular()) out = getTangentToCircle(coordinate);
         else {
-            int vertexIndex= getCorrespondingVertexOfBoundaryPoint(coordinate);
+            int vertexIndex = getCorrespondingVertexOfBoundaryPoint(coordinate);
             if (vertexIndex != -1) {
                 int previous = (vertexIndex != 0) ? vertexIndex - 1 : getGeometry().getCoordinates().length - 2;
                 int next = (vertexIndex != getGeometry().getCoordinates().length - 1) ? vertexIndex + 1 : 1;
@@ -219,20 +227,21 @@ public interface Collidable {
                 head1 = toCoordinate(addUpPoints(toPoint(head1), toPoint(coordinateCur)));
                 head2 = toCoordinate(addUpPoints(toPoint(head2), toPoint(coordinateCur)));
                 out = new LineSegment(head1, head2);
-            }
-            else {
-                out=getUnderlyingEdgeOfBoundaryPoint(coordinate);
+            } else {
+                out = getUnderlyingEdgeOfBoundaryPoint(coordinate);
                 out = (out == null) ? getTangentDirection(getClosestCoordinate(coordinate, getGeometry())) : out;
             }
         }
         return out;
     }
-    default LineSegment getTangentToCircle(Coordinate coordinate){
+
+    default LineSegment getTangentToCircle(Coordinate coordinate) {
         Coordinate head1 = toCoordinate(rotateAbout(getAnchor(), toPoint(coordinate), 90));
         Coordinate head2 = toCoordinate(rotateAbout(getAnchor(), toPoint(coordinate), -90));
         return new LineSegment(head1, head2);
     }
-    default int getCorrespondingVertexOfBoundaryPoint(Coordinate coordinate){
+
+    default int getCorrespondingVertexOfBoundaryPoint(Coordinate coordinate) {
         int index = -1;
         float minDistance = Float.MAX_VALUE;
         for (int i = 0; i < getGeometry().getCoordinates().length; i++) {
@@ -244,7 +253,8 @@ public interface Collidable {
         }
         return index;
     }
-    default LineSegment getUnderlyingEdgeOfBoundaryPoint(Coordinate coordinate){
+
+    default LineSegment getUnderlyingEdgeOfBoundaryPoint(Coordinate coordinate) {
         LineSegment out = null;
         float minEdgeDistance = Float.MAX_VALUE;
         for (int i = 0; i < getGeometry().getCoordinates().length - 1; i++) {
@@ -276,7 +286,8 @@ public interface Collidable {
                 return geometry.crosses(collidable.getGeometry());
             }
             return collidable.getAnchor().distance(toPoint(getClosestCoordinate(toCoordinate(collidable.getAnchor()), geometry))) > collidable.getRadius();
-        } else if (isCircular() && collidable.isCircular()) return getAnchor().distance(collidable.getAnchor()) > getRadius() + collidable.getRadius();
+        } else if (isCircular() && collidable.isCircular())
+            return getAnchor().distance(collidable.getAnchor()) > getRadius() + collidable.getRadius();
         else {
             collidable.createGeometry();
             return getClosestCoordinate(toCoordinate(anchorLocation), collidable.getGeometry()).distance(toCoordinate(anchorLocation)) < getRadius();
@@ -290,7 +301,8 @@ public interface Collidable {
         if (!(this instanceof Translatable)) return false;
         for (Collidable collidable : collidables) {
             boolean shouldCollide = this.collide(collidable) && collidable.collide(this);
-            if (!(collidable instanceof Translatable) && shouldCollide && willCross(collidable, anchorLocation)) return true;
+            if (!(collidable instanceof Translatable) && shouldCollide && willCross(collidable, anchorLocation))
+                return true;
         }
         return false;
     }

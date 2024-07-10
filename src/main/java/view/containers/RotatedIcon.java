@@ -56,11 +56,15 @@ public class RotatedIcon implements Icon {
     }
 
     public void rotate(float degrees) {
-        this.setDegrees(validateAngle(this.degrees-degrees));
+        this.setDegrees(validateAngle(this.degrees - degrees));
     }
 
     public Point getRotationAnchor() {
         return rotationAnchor;
+    }
+
+    public void setRotationAnchor(Point rotationAnchor) {
+        this.rotationAnchor = rotationAnchor;
     }
 
     public Icon getIcon() {
@@ -103,11 +107,9 @@ public class RotatedIcon implements Icon {
         this.height = height;
     }
 
-    public void setRotationAnchor(Point rotationAnchor) {
-        this.rotationAnchor = rotationAnchor;
+    public float getOpacity() {
+        return opacity;
     }
-
-    public float getOpacity() {return opacity;}
 
     public void setOpacity(float opacity) {
         this.opacity = opacity;

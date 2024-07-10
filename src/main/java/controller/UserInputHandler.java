@@ -6,20 +6,23 @@ import view.menu.PauseMenu;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.concurrent.TimeUnit;
 
 import static controller.UserInputHandler.InputAction.InputActionType.*;
-import static controller.UserInterfaceController.*;
+import static controller.UserInterfaceController.fireSkill;
+import static controller.UserInterfaceController.isGameRunning;
 import static controller.constants.EntityConstants.SHOTS_PER_SECOND;
 import static view.containers.GlassFrame.getGlassFrame;
 
 public final class UserInputHandler {
-    private static UserInputHandler INSTANCE;
     public static final InputMap inputMap = new InputMap();
     public static final ActionMap actionMap = new ActionMap();
     public static final String PRESSED = "pressed";
     public static final String RELEASED = "released";
+    private static UserInputHandler INSTANCE;
     private boolean moveUpInd;
     private boolean moveDownInd;
     private boolean moveLeftInd;
@@ -50,14 +53,16 @@ public final class UserInputHandler {
         actionMap.put(MOVE_RIGHT + RELEASED, new InputAction(MOVE_RIGHT, false));
 
         inputMap.put(KeyStroke.getKeyStroke(Profile.PAUSE_KEYCODE, 0, true), PAUSE);
-        actionMap.put(PAUSE, new InputAction(PAUSE,true));
+        actionMap.put(PAUSE, new InputAction(PAUSE, true));
 
         inputMap.put(KeyStroke.getKeyStroke(Profile.SKILL_KEYCODE, 0, true), SKILL);
-        actionMap.put(SKILL, new InputAction(SKILL,true));
+        actionMap.put(SKILL, new InputAction(SKILL, true));
 
         getGlassFrame().addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {new InputAction(SHOOT).run();}
+            public void mouseClicked(MouseEvent e) {
+                new InputAction(SHOOT).run();
+            }
         });
     }
 
@@ -122,7 +127,10 @@ public final class UserInputHandler {
         motionPanelView.setInputMap(JComponent.WHEN_FOCUSED, inputMap);
         motionPanelView.setActionMap(actionMap);
         motionPanelView.requestFocus();
-        moveUpInd=false;moveDownInd=false;moveLeftInd=false;moveRightInd=false;
+        moveUpInd = false;
+        moveDownInd = false;
+        moveLeftInd = false;
+        moveRightInd = false;
     }
 
     public long getShootTimeDiffCapture() {
@@ -163,7 +171,7 @@ public final class UserInputHandler {
 
         @Override
         public void run() {
-            if (this.inputActionType==SHOOT && isGameRunning()) {
+            if (this.inputActionType == SHOOT && isGameRunning()) {
                 long now = System.nanoTime();
                 if (now - getINSTANCE().getLastShootingTime() >= TimeUnit.SECONDS.toNanos(1) / SHOTS_PER_SECOND.getValue()) {
                     getINSTANCE().setShootInd(true);

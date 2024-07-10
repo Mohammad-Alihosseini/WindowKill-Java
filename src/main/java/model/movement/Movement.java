@@ -17,6 +17,7 @@ import static model.Utils.*;
 
 @SuppressWarnings("FieldMayBeFinal")
 public class Movement {
+    private static final Random random = new Random();
     private final List<ActionListener> moveListeners = new CopyOnWriteArrayList<>();
     private Point2D lastAnchor = new Point2D.Float(0, 0);
     private long lastAnchorUpdateTime = System.nanoTime();
@@ -31,7 +32,6 @@ public class Movement {
     private String modelId;
     private Point2D target = null;
     private String targetModelId = null;
-    private static final Random random=new Random();
 
     public Movement(String modelId, Point2D anchor) {
         this.setModelId(modelId);
@@ -101,7 +101,7 @@ public class Movement {
 
     public void impact(Direction direction, float tempSpeed, float tempAcceleration, float scale) {
         moveListeners.removeIf(DecelerationWorker.class::isInstance);
-        moveListeners.removeIf(actionListener -> actionListener instanceof TypedActionListener typedAL && typedAL.getType()== TypedActionListener.ActionListenerType.IMPACT);
+        moveListeners.removeIf(actionListener -> actionListener instanceof TypedActionListener typedAL && typedAL.getType() == TypedActionListener.ActionListenerType.IMPACT);
         setSpeed(getSpeedSave());
         final Movement[] finalMovement = {this};
         final float[] finalTempSpeed = {tempSpeed * scale};
@@ -160,10 +160,6 @@ public class Movement {
         return moveListeners;
     }
 
-    public void setDirection(Direction direction) {
-        this.direction = direction;
-    }
-
     public Point2D getAnchor() {
         return anchor;
     }
@@ -203,6 +199,10 @@ public class Movement {
 
     public Direction getDirection() {
         return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
     }
 
     public float getAngularSpeed() {

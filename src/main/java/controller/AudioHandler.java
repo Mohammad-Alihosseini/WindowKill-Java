@@ -20,7 +20,7 @@ import static controller.constants.FilePaths.*;
 
 public abstract class AudioHandler {
     public static final ConcurrentMap<Clip, SoundEffectType> clips = new ConcurrentHashMap<>();
-    public static final Random random=new Random();
+    public static final Random random = new Random();
 
     public static synchronized float playSoundEffect(SoundEffectType type, int i) {
         ClipControlled clipControlled = playSoundEffect(getSoundEffectPath(type, i));
@@ -82,7 +82,9 @@ public abstract class AudioHandler {
             float frameRate = format.getFrameRate();
             length = audioFileLength / (frameSize * frameRate);
             new Thread(finalClip::start).start();
-        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {throw new UnsupportedOperationException("Playback failed for: "+address);}
+        } catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
+            throw new UnsupportedOperationException("Playback failed for: " + address);
+        }
         return new ClipControlled(clip, length);
     }
 

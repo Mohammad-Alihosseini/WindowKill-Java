@@ -14,12 +14,12 @@ import static model.characters.GeoShapeModel.allShapeModelsList;
 import static model.collision.Collidable.collidables;
 
 public abstract class Entity {
+    private final ConcurrentMap<AttackTypes, Integer> damageSize = new ConcurrentHashMap<>();
     private int health;
     private int fullHealth;
     private boolean vulnerable;
     private int numberOfCollectibles = 0;
     private int collectibleValue = 0;
-    private final ConcurrentMap<AttackTypes, Integer> damageSize = new ConcurrentHashMap<>();
     private long lastMeleeTime = 0;
 
     public abstract String getModelId();

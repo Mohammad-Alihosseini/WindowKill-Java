@@ -8,17 +8,17 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-@SuppressWarnings({"FieldCanBeLocal","FieldMayBeFinal"})
+@SuppressWarnings({"FieldCanBeLocal", "FieldMayBeFinal"})
 public class Profile {
-    private static Profile current=new Profile("");
     public static final int UP_KEYCODE = KeyEvent.VK_W;
     public static final int DOWN_KEYCODE = KeyEvent.VK_S;
     public static final int LEFT_KEYCODE = KeyEvent.VK_A;
     public static final int RIGHT_KEYCODE = KeyEvent.VK_D;
     public static final int SKILL_KEYCODE = KeyEvent.VK_SHIFT;
     public static final int PAUSE_KEYCODE = KeyEvent.VK_ESCAPE;
+    private static Profile current = new Profile("");
     private String profileId;
-    private List<Integer> waveEnemyCount = new CopyOnWriteArrayList<>(List.of(3,6,10,14,16));
+    private List<Integer> waveEnemyCount = new CopyOnWriteArrayList<>(List.of(3, 6, 10, 14, 16));
     private int ups = 800;
     private int fps = 80;
     private int epsilonMeleeDamage = 10;

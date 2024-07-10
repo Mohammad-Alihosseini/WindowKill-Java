@@ -14,13 +14,16 @@ public enum ImpactConstants {
 
     public float getValue() {
         return switch (this) {
-            case IMPACT_SPEED -> Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed() * 120f / Profile.getCurrent().getUps();
-            case IMPACT_DECELERATION -> Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed() * (-55f) / (Profile.getCurrent().getUps() * Profile.getCurrent().getUps());
+            case IMPACT_SPEED ->
+                    Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed() * 120f / Profile.getCurrent().getUps();
+            case IMPACT_DECELERATION ->
+                    Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed() * (-55f) / (Profile.getCurrent().getUps() * Profile.getCurrent().getUps());
             case IMPACT_RADIUS -> Profile.getCurrent().getSizeScale() * 100;
             case IMPACT_SCALE -> 2f;
             case IMPACT_DRIFT_FACTOR -> 1.1f;
             case IMPACT_DRIFT_THRESHOLD -> 1.0001f;
-            case IMPACT_COOLDOWN -> TimeUnit.SECONDS.toNanos(1) / (100f * Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed());
+            case IMPACT_COOLDOWN ->
+                    TimeUnit.SECONDS.toNanos(1) / (100f * Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed());
             case COLLISION_SENSITIVITY -> 0.8f * Profile.getCurrent().getSizeScale();
             case DETECTION_SENSITIVITY -> 4f / Profile.getCurrent().getSizeScale();
             case DIRECTION_SENSITIVITY -> 0.00001f;

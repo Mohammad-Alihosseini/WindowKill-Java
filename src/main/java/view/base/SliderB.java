@@ -1,4 +1,4 @@
-package view.containers;
+package view.base;
 
 import view.Utils;
 
@@ -12,13 +12,13 @@ import static controller.constants.UIConstants.*;
 import static view.Utils.*;
 
 public class SliderB extends JSlider {
-    private transient BufferedImage imageSave;
     private final Container container;
+    private transient BufferedImage imageSave;
     private JLabel backgroundLabel;
     private ButtonB labelButton;
 
     public SliderB(Container container, float minimum, float maximum, float current, String name) {
-        imageSave=toBufferedImage(SLIDER_UI_PATH.getValue());
+        imageSave = toBufferedImage(SLIDER_UI_PATH.getValue());
         this.container = container;
         setFocusable(false);
         setOpaque(false);

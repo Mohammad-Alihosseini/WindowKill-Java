@@ -14,12 +14,17 @@ import java.util.stream.IntStream;
 import static model.Utils.rotateAbout;
 
 public class Utils {
-    private Utils(){}
-
-    public static BufferedImage toBufferedImage(String path){
-        try {return ImageIO.read(new File(path));}
-        catch (IOException e) {throw new ImagingOpException("Failed to read image from path: "+path);}
+    private Utils() {
     }
+
+    public static BufferedImage toBufferedImage(String path) {
+        try {
+            return ImageIO.read(new File(path));
+        } catch (IOException e) {
+            throw new ImagingOpException("Failed to read image from path: " + path);
+        }
+    }
+
     public static BufferedImage toBufferedImage(Image image) {
         if (image instanceof BufferedImage bufferedImage) return bufferedImage;
         BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
@@ -54,7 +59,7 @@ public class Utils {
     }
 
     public static BufferedImage bufferedImageClone(BufferedImage bi) {
-        if (bi==null) return null;
+        if (bi == null) return null;
         BufferedImage clone = new BufferedImage(bi.getWidth(), bi.getHeight(), bi.getType());
         bi.copyData(clone.getRaster());
         return clone;
@@ -71,7 +76,8 @@ public class Utils {
         if (isCircular) return new Point[]{new Point(viewSize.width, viewSize.height), new Point(0, 0)};
         Point[] corners = new Point[]{new Point(0, 0), new Point(viewSize.width, 0), new Point(0, viewSize.height), new Point(viewSize.width, viewSize.height)};
         Point[] rotatedCorners = new Point[4];
-        for (int i = 0; i < corners.length; i++) rotatedCorners[i] = (Point) rotateAbout(corners[i], relativeAnchor, angle);
+        for (int i = 0; i < corners.length; i++)
+            rotatedCorners[i] = (Point) rotateAbout(corners[i], relativeAnchor, angle);
         CopyOnWriteArrayList<Integer> rotatedCornersX = new CopyOnWriteArrayList<>();
         CopyOnWriteArrayList<Integer> rotatedCornersY = new CopyOnWriteArrayList<>();
         for (Point point : rotatedCorners) {
@@ -103,10 +109,14 @@ public class Utils {
         if (cnt == 0) return new Color(0, 0, 0, 0);
         return new Color(sumR / cnt, sumG / cnt, sumB / cnt);
     }
-    public static float validateAngle(float angle){return (float) (angle - Math.floor(angle / 360) * 360);}
 
-    public static BufferedImage cropImage(Point2D location, Dimension dimension, BufferedImage image, boolean resize){
-        if (resize) return toBufferedImage(image.getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
-        else return image.getSubimage((int) location.getX(), (int) location.getY(),dimension.width,dimension.height);
+    public static float validateAngle(float angle) {
+        return (float) (angle - Math.floor(angle / 360) * 360);
+    }
+
+    public static BufferedImage cropImage(Point2D location, Dimension dimension, BufferedImage image, boolean resize) {
+        if (resize)
+            return toBufferedImage(image.getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
+        else return image.getSubimage((int) location.getX(), (int) location.getY(), dimension.width, dimension.height);
     }
 }

@@ -20,9 +20,9 @@ import static controller.constants.WaveConstants.MIN_ENEMY_SPAWN_RADIUS;
 import static model.Utils.*;
 
 public class WaveManager {
+    public static final Random random = new Random();
     public final List<Integer> waveCount = Profile.getCurrent().getWaveEnemyCount();
     private final List<GeoShapeModel> waveEntities = new CopyOnWriteArrayList<>();
-    public static final Random random = new Random();
 
     public void start() {
         initiateWave(0);
@@ -78,7 +78,7 @@ public class WaveManager {
     }
 
     public void finishGame(float lastSceneTime) {
-        Timer timer=new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) lastSceneTime), e -> {
+        Timer timer = new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) lastSceneTime), e -> {
             exitGame();
             Profile.getCurrent().saveXP();
             MainMenu.flushINSTANCE();
