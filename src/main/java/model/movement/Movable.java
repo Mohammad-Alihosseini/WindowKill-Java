@@ -1,9 +1,14 @@
 package model.movement;
 
-import java.awt.geom.Point2D;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public interface Movable {
-    void moveShapeModel(Point2D point);
+    CopyOnWriteArrayList<Movable> movables = new CopyOnWriteArrayList<>();
+    long getPositionUpdateTimeDiffCapture();
 
-    void rotateShapeModel(double angle);
+    void setPositionUpdateTimeDiffCapture(long time);
+
+    long getLastPositionUpdateTime();
+
+    void setLastPositionUpdateTime(long time);
 }

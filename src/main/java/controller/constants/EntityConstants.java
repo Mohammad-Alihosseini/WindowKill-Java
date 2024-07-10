@@ -14,7 +14,7 @@ public enum EntityConstants {
 
     public int getValue() {
         return switch (this) {
-            case EPSILON_SHOOTING_RAPIDITY -> Profile.getCurrent().EPSILON_SHOOTING_RAPIDITY;
+            case EPSILON_SHOOTING_RAPIDITY -> Profile.getCurrent().getEpsilonShootingRapidity();
             case EPSILON_HEALTH -> 100;
             case SHOTS_PER_SECOND -> 2;
             case SKILL_COOLDOWN_IN_MINUTES -> 5;
@@ -31,7 +31,7 @@ public enum EntityConstants {
     public enum EntityVertices {
         TRIGORATH_VERTICES, SQUARANTINE_VERTICES, BULLET_VERTICES, EPSILON_VERTICES, COLLECTIBLE_VERTICES;
 
-        public CopyOnWriteArrayList<Point2D> getValue() {
+        public List<Point2D> getValue() {
             return switch (this) {
 
                 case TRIGORATH_VERTICES -> new CopyOnWriteArrayList<>(

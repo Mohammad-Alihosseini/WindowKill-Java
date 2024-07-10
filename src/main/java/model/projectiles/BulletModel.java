@@ -16,16 +16,16 @@ import static model.Utils.roundPoint;
 public class BulletModel extends GeoShapeModel {
     public BulletModel(Point anchor, String motionPanelId, int damage) {
         super(new Point(0, 0), BULLET_VERTICES.getValue(), BULLET_HEALTH.getValue());
-        this.isCircular = true;
-        this.motionPanelId = motionPanelId;
-        this.anchorSave = deepClone(BULLET_CENTER.getValue());
-        assert anchorSave != null;
-        createBullet(modelId, roundPoint(anchorSave), motionPanelId);
+        this.setCircular(true);
+        setMotionPanelId(motionPanelId);
+        this.setAnchorSave(deepClone(BULLET_CENTER.getValue()));
+        assert getAnchorSave() != null;
+        createBullet(getModelId(), roundPoint(getAnchorSave()), motionPanelId);
         moveShapeModel(anchor);
-        movement.setAnchor(anchor);
-        movement.angularSpeed = 0;
-        movement.speed = BULLET_SPEED.getValue();
-        movement.speedSave = BULLET_SPEED.getValue();
-        damageSize.put(AttackTypes.MELEE, damage);
+        getMovement().setAnchor(anchor);
+        getMovement().setAngularSpeed(0);
+        getMovement().setSpeed(BULLET_SPEED.getValue());
+        getMovement().setSpeedSave(BULLET_SPEED.getValue());
+        getDamageSize().put(AttackTypes.MELEE, damage);
     }
 }

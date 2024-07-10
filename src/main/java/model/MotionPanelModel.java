@@ -1,7 +1,9 @@
 package model;
 
+import controller.AtomicFloat;
 import controller.TypedActionListener;
 import model.collision.Collidable;
+import model.movement.Movable;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -11,45 +13,48 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.Point2D;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static controller.UserInterfaceController.createMotionPanel;
 import static controller.constants.DimensionConstants.Dimension2DConstants.DEFORM_DIMENSION;
+import static controller.constants.DimensionConstants.Dimension2DConstants.MAIN_MOTIONPANEL_DIMENSION;
 import static controller.constants.DimensionConstants.SCREEN_SIZE;
 import static controller.constants.MovementConstants.POSITION_UPDATE_INTERVAL;
 import static controller.constants.ShrinkConstants.*;
 import static model.Utils.*;
 
-public class MotionPanelModel implements Collidable {
-    public volatile static MotionPanelModel mainMotionPanelModel;
-    public volatile static CopyOnWriteArrayList<MotionPanelModel> allMotionPanelModelsList = new CopyOnWriteArrayList<>();
-    public CopyOnWriteArrayList<ActionListener> deformationListeners = new CopyOnWriteArrayList<>();
-    public String modelId;
-    public Point2D location;
-    public long lastPositionUpdateTime = System.nanoTime();
-    public long positionUpdateTimeDiffCapture = 0;
+public class MotionPanelModel implements Collidable, Movable {
+    public static final List<MotionPanelModel> allMotionPanelModelsList = new CopyOnWriteArrayList<>();
+    public final List<ActionListener> deformationListeners = new CopyOnWriteArrayList<>();
+    private static MotionPanelModel mainMotionPanelModel;
+    private final String modelId;
     /**
      * Since there is not a well-structured non-abstract class for high-precision {@link Dimension} in Java/JTS the choice is
      * made to use an instance of Point2D instead of Dimension to do the floating-point arithmetic and calculations
      * of motion panel to avoid stack-up of quantitative errors throughout rapid calls
      */
-    public Point2D dimension;
-    Geometry geometry;
-    Point2D lastLocation;
-    Point2D lastDimension;
+    private Point2D location;
+    private long lastPositionUpdateTime = System.nanoTime();
+    private long positionUpdateTimeDiffCapture = 0;
+    private Point2D dimension;
+    private Geometry geometry;
+    private Point2D lastLocation;
+    private Point2D lastDimension;
 
     public MotionPanelModel(Point2D location, Point2D dimension) {
-        if (mainMotionPanelModel == null) mainMotionPanelModel = this;
         this.modelId = UUID.randomUUID().toString();
         allMotionPanelModelsList.add(this);
         setPosition(location, dimension);
         Collidable.collidables.add(this);
+        Movable.movables.add(this);
         createMotionPanel(modelId, dimension, location);
 
         new Timer((int) SHRINK_DELAY.getValue(), e -> {
-            if (!hasShrinkType(TypedActionListener.Side.CENTER)) deform(DEFORM_DIMENSION.getValue(), TypedActionListener.Side.CENTER, SHRINK_SPEED.getValue());
+            if (!hasShrinkType(TypedActionListener.Side.CENTER)) {
+                deform(DEFORM_DIMENSION.getValue(), TypedActionListener.Side.CENTER, SHRINK_SCALE.getValue());
+            }
         }).start();
     }
 
@@ -114,9 +119,18 @@ public class MotionPanelModel implements Collidable {
         return x && y && width && height;
     }
 
+    public static MotionPanelModel getMainMotionPanelModel() {
+        if (mainMotionPanelModel==null) mainMotionPanelModel=new MotionPanelModel(MAIN_MOTIONPANEL_DIMENSION.getValue());
+        return mainMotionPanelModel;
+    }
+
+    public static void setMainMotionPanelModel(MotionPanelModel mainMotionPanelModel) {
+        MotionPanelModel.mainMotionPanelModel = mainMotionPanelModel;
+    }
+
     /**
      * <p>1- Calculates the thresholds</p>
-     * <p>2- Adds a {@link TypedActionListener.ShrinkActionListener} to the list of deformationListeners</p>
+     * <p>2- Adds a {@link TypedActionListener} of type SHRINK to the list of deformationListeners</p>
      * <p>3- Stops the process if it's a center shrinking unless there is no other shrinks</p>
      * <p>4- Until thresholds are not met, evaluates the progress in width-height and justifies the position</p>
      * <p>5- If motion panel hits the boundary of screen, terminates the process</p>
@@ -127,37 +141,38 @@ public class MotionPanelModel implements Collidable {
      * @apiNote Step 5 is not mandatory for frames that are not local to any inertial entity
      */
     public void deform(Point2D finalSize, TypedActionListener.Side side, float scale) {
-        AtomicReference<Float> momentaryVelocity = new AtomicReference<>(scale * DEFORM_VELOCITY.getValue());
-        final float[] distanceW = {(float) (dimension.getX() - finalSize.getX())};
-        final float[] distanceH = {(float) (dimension.getY() - finalSize.getY())};
-        deformationListeners.removeIf(actionListener ->
-                actionListener instanceof TypedActionListener.ShrinkActionListener && ((TypedActionListener.ShrinkActionListener) actionListener).side == side);
-
-        deformationListeners.add(new TypedActionListener.ShrinkActionListener(side) {
+        AtomicFloat momentaryVelocity = new AtomicFloat(scale * DEFORM_VELOCITY.getValue());
+        AtomicFloat distanceW = new AtomicFloat ((float) (dimension.getX() - finalSize.getX()));
+        AtomicFloat distanceH = new AtomicFloat ((float) (dimension.getY() - finalSize.getY()));
+        deformationListeners.removeIf(actionListener -> isShrinkType(actionListener,side));
+        deformationListeners.add(new TypedActionListener(TypedActionListener.ActionListenerType.SHRINK,side) {
             @Override
             public void actionPerformed(ActionEvent e) {
-                boolean interrupt = false;
-                for (Side side1 : Side.values())
-                    if (side1 != Side.CENTER && hasShrinkType(side1)) interrupt = true;
-                interrupt = side == Side.CENTER && interrupt;
-
-                if (!interrupt && (Math.abs(distanceW[0]) > SHRINK_THRESHOLD_SENSITIVITY.getValue() || Math.abs(distanceH[0]) > SHRINK_THRESHOLD_SENSITIVITY.getValue())) {
-                    float progW = evaluateProgress(distanceW[0], momentaryVelocity.get());
-                    float progH = evaluateProgress(distanceH[0], momentaryVelocity.get());
+                boolean interrupt = interruptShrink(side);
+                if (!interrupt && (Math.abs(distanceW.get()) > SHRINK_THRESHOLD_SENSITIVITY.getValue() || Math.abs(distanceH.get()) > SHRINK_THRESHOLD_SENSITIVITY.getValue())) {
+                    float progW = evaluateProgress(distanceW.get(), momentaryVelocity.get());
+                    float progH = evaluateProgress(distanceH.get(), momentaryVelocity.get());
                     Point2D newDimension = new Point2D.Float((float) (dimension.getX() - progW), (float) (dimension.getY() - progH));
                     Point2D offset = positionJustify(new Point2D.Float(progW, progH), side);
 
                     Point2D newLocation = addUpPoints(location, offset);
                     if (isInScreen(newLocation, newDimension)) {
                         setPosition(newLocation, newDimension);
-                        distanceW[0] -= progW;
-                        distanceH[0] -= progH;
-                        if (momentaryVelocity.get() + SHRINK_DECELERATION.getValue() >= DEFORM_SPEED_SENSITIVITY.getValue())
-                            momentaryVelocity.updateAndGet(v -> v + SHRINK_DECELERATION.getValue());
+                        distanceW.addAndGet(-progW);
+                        distanceH.addAndGet(-progH);
+                        if (momentaryVelocity.get() + DEFORM_DECELERATION.getValue() >= DEFORM_SPEED_SENSITIVITY.getValue())
+                            momentaryVelocity.addAndGet(DEFORM_DECELERATION.getValue());
                     } else deformationListeners.remove(this);
                 } else deformationListeners.remove(this);
             }
         });
+    }
+    public boolean interruptShrink(TypedActionListener.Side side){
+        boolean interrupt=false;
+        for (TypedActionListener.Side side1 : TypedActionListener.Side.values())
+            if (side1 != TypedActionListener.Side.CENTER && hasShrinkType(side1)) interrupt = true;
+        interrupt = side == TypedActionListener.Side.CENTER && interrupt;
+        return interrupt;
     }
 
     /**
@@ -168,10 +183,10 @@ public class MotionPanelModel implements Collidable {
      */
     public void extend(Point point) {
         TypedActionListener.Side[] collisionSides = detectCollisionSides(point);
-        if (collisionSides[0] != null) deform(new Point2D.Float((float) (dimension.getX() + EXTENSION_LENGTH.getValue()),
-                (float) dimension.getY()), collisionSides[0], EXTEND_SPEED.getValue());
-        if (collisionSides[1] != null) deform(new Point2D.Float((float) dimension.getX(), (float) (dimension.getY() + EXTENSION_LENGTH.getValue())),
-                collisionSides[1], EXTEND_SPEED.getValue());
+        if (collisionSides[0] != null) deform(new Point2D.Float((float) (getDimension().getX() + EXTENSION_LENGTH.getValue()),
+                (float) getDimension().getY()), collisionSides[0], EXTEND_SPEED_SCALE.getValue());
+        if (collisionSides[1] != null) deform(new Point2D.Float((float) getDimension().getX(), (float) (getDimension().getY() + EXTENSION_LENGTH.getValue())),
+                collisionSides[1], EXTEND_SPEED_SCALE.getValue());
     }
 
     /**
@@ -180,13 +195,13 @@ public class MotionPanelModel implements Collidable {
      * @param point the point of collision of the enforcing entity with the boundary of motion panel
      */
     public TypedActionListener.Side[] detectCollisionSides(Point point) {
-        float x_distance = (float) Math.min(Math.abs(location.getX() + dimension.getX() - point.x), Math.abs(point.x - location.getX()));
-        float y_distance = (float) Math.min(Math.abs(location.getY() + dimension.getY() - point.y), Math.abs(point.y - location.getY()));
+        float xDistance = (float) Math.min(Math.abs(getLocation().getX() + getDimension().getX() - point.x), Math.abs(point.x - getLocation().getX()));
+        float yDistance = (float) Math.min(Math.abs(getLocation().getY() + getDimension().getY() - point.y), Math.abs(point.y - getLocation().getY()));
         TypedActionListener.Side sideX = null;
         TypedActionListener.Side sideY = null;
-        if (Math.abs(x_distance) < DEFORM_SENSITIVITY.getValue()) sideX = (location.getX() + dimension.getX() - point.x) >= (point.x - location.getX()) ?
+        if (Math.abs(xDistance) < DEFORM_SENSITIVITY.getValue()) sideX = (getLocation().getX() + getDimension().getX() - point.x) >= (point.x - getLocation().getX()) ?
                 TypedActionListener.Side.LEFT : TypedActionListener.Side.RIGHT;
-        if (Math.abs(y_distance) < DEFORM_SENSITIVITY.getValue()) sideY = (location.getY() + dimension.getY() - point.y) >= (point.y - location.getY()) ?
+        if (Math.abs(yDistance) < DEFORM_SENSITIVITY.getValue()) sideY = (getLocation().getY() + getDimension().getY() - point.y) >= (point.y - getLocation().getY()) ?
                 TypedActionListener.Side.TOP : TypedActionListener.Side.BOTTOM;
         return new TypedActionListener.Side[]{sideX, sideY};
     }
@@ -197,22 +212,22 @@ public class MotionPanelModel implements Collidable {
      * @param side the direction of shrink process
      */
     public boolean hasShrinkType(TypedActionListener.Side side) {
-        for (ActionListener actionListener : deformationListeners) {
-            if (actionListener instanceof TypedActionListener.ShrinkActionListener
-                    && ((TypedActionListener.ShrinkActionListener) actionListener).side == side) return true;
-        }
+        for (ActionListener actionListener : deformationListeners) if (isShrinkType(actionListener,side)) return true;
         return false;
+    }
+    public boolean isShrinkType(ActionListener actionListener,TypedActionListener.Side side) {
+        return  (actionListener instanceof TypedActionListener typedAL && typedAL.getType()== TypedActionListener.ActionListenerType.SHRINK && typedAL.getSide() == side);
     }
 
     public void setPosition(Point2D location, Point2D dimension) {
         long now = System.nanoTime();
         if (now - lastPositionUpdateTime >= POSITION_UPDATE_INTERVAL.getValue()) {
             lastPositionUpdateTime = now;
-            this.lastLocation = deepClone(location);
-            this.lastDimension = deepClone(dimension);
+            this.setLastLocation(deepClone(location));
+            this.setLastDimension(deepClone(dimension));
         }
-        this.location = location;
-        this.dimension = dimension;
+        this.setLocation(location);
+        this.setDimension(dimension);
     }
 
     public String getModelId() {
@@ -221,12 +236,12 @@ public class MotionPanelModel implements Collidable {
 
     @Override
     public void createGeometry() {
-        geometry = new GeometryFactory().createLineString(new Coordinate[]{
-                new Coordinate(location.getX(), location.getY()),
-                new Coordinate(location.getX() + dimension.getX(), location.getY()),
-                new Coordinate(location.getX() + dimension.getX(), location.getY() + dimension.getY()),
-                new Coordinate(location.getX(), location.getY() + dimension.getY()),
-                new Coordinate(location.getX(), location.getY())});
+        setGeometry(new GeometryFactory().createLineString(new Coordinate[]{
+                new Coordinate(getLocation().getX(), getLocation().getY()),
+                new Coordinate(getLocation().getX() + getDimension().getX(), getLocation().getY()),
+                new Coordinate(getLocation().getX() + getDimension().getX(), getLocation().getY() + getDimension().getY()),
+                new Coordinate(getLocation().getX(), getLocation().getY() + getDimension().getY()),
+                new Coordinate(getLocation().getX(), getLocation().getY())}));
     }
 
     @Override
@@ -284,16 +299,52 @@ public class MotionPanelModel implements Collidable {
         this.lastPositionUpdateTime = time;
     }
 
+    public Point2D getLocation() {
+        return location;
+    }
+
+    public void setLocation(Point2D location) {
+        this.location = location;
+    }
+    public Point2D getDimension() {
+        return dimension;
+    }
+
+    public void setDimension(Point2D dimension) {
+        this.dimension = dimension;
+    }
+
+    public void setGeometry(Geometry geometry) {
+        this.geometry = geometry;
+    }
+
+    public Point2D getLastLocation() {
+        return lastLocation;
+    }
+
+    public void setLastLocation(Point2D lastLocation) {
+        this.lastLocation = lastLocation;
+    }
+
+    public Point2D getLastDimension() {
+        return lastDimension;
+    }
+
+    public void setLastDimension(Point2D lastDimension) {
+        this.lastDimension = lastDimension;
+    }
+
     @Override
     public Point2D getMovementVector(Point2D collisionPoint) {
         TypedActionListener.Side[] sides = detectCollisionSides(roundPoint(collisionPoint));
         TypedActionListener.Side collisionSide = sides[0] != null ? sides[0] : sides[1];
-        Point2D out = new Point2D.Float(0, 0);
+        Point2D out = null;
         switch (collisionSide) {
-            case LEFT -> out = new Point2D.Float((float) (location.getX() - lastLocation.getX()), 0);
-            case RIGHT -> out = new Point2D.Float((float) (location.getX() + dimension.getX() - lastLocation.getX() - lastDimension.getX()), 0);
-            case TOP -> out = new Point2D.Float(0, (float) (location.getY() - lastLocation.getY()));
-            case BOTTOM -> out = new Point2D.Float(0, (float) (location.getY() + dimension.getY() - lastLocation.getY() - lastDimension.getY()));
+            case LEFT -> out = new Point2D.Float((float) (getLocation().getX() - getLastLocation().getX()), 0);
+            case RIGHT -> out = new Point2D.Float((float) (getLocation().getX() + getDimension().getX() - getLastLocation().getX() - getLastDimension().getX()), 0);
+            case TOP -> out = new Point2D.Float(0, (float) (getLocation().getY() - getLastLocation().getY()));
+            case BOTTOM -> out = new Point2D.Float(0, (float) (getLocation().getY() + getDimension().getY() - getLastLocation().getY() - getLastDimension().getY()));
+            case CENTER -> out = new Point2D.Float(0, 0);
         }
         return out;
     }

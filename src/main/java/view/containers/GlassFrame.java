@@ -1,22 +1,25 @@
 package view.containers;
 
+import controller.UserInterfaceController;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 
+import static controller.constants.DimensionConstants.FPS_COUNTER_DIMENSION;
 import static controller.constants.DimensionConstants.SCREEN_SIZE;
+import static controller.constants.FilePaths.ICON_PATH;
 import static controller.constants.ShrinkConstants.MINIMIZE_DELAY;
+import static controller.constants.UIConstants.*;
+import static view.Utils.changeColorOpacity;
 
 public final class GlassFrame extends JFrame {
     private static GlassFrame INSTANCE;
 
     private GlassFrame() throws HeadlessException {
         super();
-        try {
-            minimizeAll();
-        } catch (AWTException e) {
-            throw new RuntimeException(e);
-        }
+        try {minimizeAll();}
+        catch (AWTException e) {throw new UnsupportedOperationException("Failed to minimize");}
         setUndecorated(true);
         setBackground(new Color(1, 0, 0, 1));
         setSize(SCREEN_SIZE.getValue().width, SCREEN_SIZE.getValue().height);
@@ -24,6 +27,9 @@ public final class GlassFrame extends JFrame {
         setLocationRelativeTo(null);
         setLayout(null);
         setVisible(true);
+        setIgnoreRepaint(true);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(ICON_PATH.getValue()));
+        setupFpsCounter();
     }
 
     public static void minimizeAll() throws AWTException {
@@ -35,13 +41,23 @@ public final class GlassFrame extends JFrame {
         r.keyRelease(KeyEvent.VK_WINDOWS);
     }
 
-    public static void setupHUI() {
-        //TODO setup game HUI
+    public void setupFpsCounter() {
+        JLabel fpsCounter=new JLabel();
+        fpsCounter.setFont(MANTINIA_FONT.deriveFont(Font.BOLD,FPS_COUNTER_FONT_SIZE.getValue()));
+        fpsCounter.setForeground(BLOOD_RED);
+        fpsCounter.setLocation(10,50);
+        fpsCounter.setSize(FPS_COUNTER_DIMENSION.getValue());
+        fpsCounter.setBackground(changeColorOpacity(SCI_FI_DARK_BLUE, FPS_COUNTER_OPACITY.getValue()));
+        fpsCounter.setOpaque(true);
+        new Timer(10,e -> {
+            fpsCounter.setText(UserInterfaceController.getFpsUps());
+            fpsCounter.setVisible(!fpsCounter.getText().isEmpty());
+        }).start();
+        add(fpsCounter);
     }
 
     public static GlassFrame getGlassFrame() {
         if (INSTANCE == null) INSTANCE = new GlassFrame();
         return INSTANCE;
     }
-
 }

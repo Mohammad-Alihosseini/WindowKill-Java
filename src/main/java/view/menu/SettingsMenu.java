@@ -1,9 +1,9 @@
 package view.menu;
 
 import model.Profile;
-import view.base.ButtonB;
-import view.base.PanelB;
-import view.base.SliderB;
+import view.containers.ButtonB;
+import view.containers.PanelB;
+import view.containers.SliderB;
 
 import java.util.List;
 
@@ -18,27 +18,27 @@ public class SettingsMenu extends PanelB {
 
     private SettingsMenu() {
         super(SETTINGS_MENU_DIMENSION.getValue());
-        SliderB gameSpeedSlider = new SliderB(this, MIN_GAME_SPEED.getValue(), MAX_GAME_SPEED.getValue(), Profile.getCurrent().GAME_SPEED, GAME_SPEED_SLIDER_NAME.getValue());
-        gameSpeedSlider.addChangeListener(e -> Profile.getCurrent().GAME_SPEED = gameSpeedSlider.getPreciseValue());
+        SliderB gameSpeedSlider = new SliderB(this, MIN_GAME_SPEED.getValue(), MAX_GAME_SPEED.getValue(), Profile.getCurrent().getGameSpeed(), GAME_SPEED_SLIDER_NAME.getValue());
+        gameSpeedSlider.addChangeListener(e -> Profile.getCurrent().setGameSpeed(gameSpeedSlider.getPreciseValue()));
 
-        SliderB volumeSlider = new SliderB(this, MIN_VOLUME.getValue(), MAX_VOLUME.getValue(), Profile.getCurrent().SOUND_SCALE, VOLUME_SLIDER_NAME.getValue());
+        SliderB volumeSlider = new SliderB(this, MIN_VOLUME.getValue(), MAX_VOLUME.getValue(), Profile.getCurrent().getSoundScale(), VOLUME_SLIDER_NAME.getValue());
         volumeSlider.addChangeListener(e -> {
-            Profile.getCurrent().SOUND_SCALE = volumeSlider.getPreciseValue();
+            Profile.getCurrent().setSoundScale(volumeSlider.getPreciseValue());
             setAllVolumes();
         });
 
-        ButtonB back = new ButtonB(ButtonB.ButtonType.small_menu_button, "BACK", (int) BACK_BUTTON_WIDTH.getValue(), BACK_BUTTON_FONT_SCALE.getValue(), false) {{
-            addActionListener(e -> {
+        ButtonB back = new ButtonB(ButtonB.ButtonType.SMALL_MENU_BUTTON, "BACK", (int) BACK_BUTTON_WIDTH.getValue(), BACK_BUTTON_FONT_SCALE.getValue(), false);
+        back.addActionListener(e -> {
                 SettingsMenu.getINSTANCE().togglePanel();
                 MainMenu.getINSTANCE().togglePanel();
-            });
-        }};
-        constraints.gridwidth = 1;
-        horizontalBulkAdd(List.of(gameSpeedSlider.labelButton, gameSpeedSlider));
-        constraints.gridy++;
-        constraints.gridx = 0;
-        horizontalBulkAdd(List.of(volumeSlider.labelButton, volumeSlider));
-        constraints.gridwidth = 2;
+        });
+
+        getConstraints().gridwidth = 1;
+        horizontalBulkAdd(List.of(gameSpeedSlider.getLabelButton(), gameSpeedSlider));
+        getConstraints().gridy++;
+        getConstraints().gridx = 0;
+        horizontalBulkAdd(List.of(volumeSlider.getLabelButton(), volumeSlider));
+        getConstraints().gridwidth = 2;
         add(back, false, true);
     }
 

@@ -1,9 +1,12 @@
 package view;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
+import java.awt.image.ImagingOpException;
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.IntStream;
@@ -11,15 +14,19 @@ import java.util.stream.IntStream;
 import static model.Utils.rotateAbout;
 
 public class Utils {
+    private Utils(){}
+
+    public static BufferedImage toBufferedImage(String path){
+        try {return ImageIO.read(new File(path));}
+        catch (IOException e) {throw new ImagingOpException("Failed to read image from path: "+path);}
+    }
     public static BufferedImage toBufferedImage(Image image) {
-        if (image instanceof BufferedImage) return (BufferedImage) image;
-        // Create a buffered image with transparency
-        BufferedImage bimage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
-        // Draw the image on to the buffered image
-        Graphics2D g2d = bimage.createGraphics();
+        if (image instanceof BufferedImage bufferedImage) return bufferedImage;
+        BufferedImage bufferedImage = new BufferedImage(image.getWidth(null), image.getHeight(null), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = bufferedImage.createGraphics();
         g2d.drawImage(image, 0, 0, null);
         g2d.dispose();
-        return bimage;
+        return bufferedImage;
     }
 
     public static void darkenImage(BufferedImage image, Rectangle rectangle) {
@@ -47,10 +54,10 @@ public class Utils {
     }
 
     public static BufferedImage bufferedImageClone(BufferedImage bi) {
-        ColorModel cm = bi.getColorModel();
-        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = bi.copyData(null);
-        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+        if (bi==null) return null;
+        BufferedImage clone = new BufferedImage(bi.getWidth(), bi.getHeight(), bi.getType());
+        bi.copyData(clone.getRaster());
+        return clone;
     }
 
     public static Point relativeLocation(Component component, Point universalLocation) {
@@ -58,7 +65,7 @@ public class Utils {
         return new Point(universalLocation.x - component.getX(), universalLocation.y - component.getY());
     }
 
-    public static Point[] rotatedInfo(Dimension viewSize, Point relativeAnchor, double angle, boolean isCircular) {
+    public static Point[] rotatedInfo(Dimension viewSize, Point relativeAnchor, float angle, boolean isCircular) {
         //Returns an array of 2 points containing newSize, Offset
 
         if (isCircular) return new Point[]{new Point(viewSize.width, viewSize.height), new Point(0, 0)};
@@ -95,5 +102,11 @@ public class Utils {
         }
         if (cnt == 0) return new Color(0, 0, 0, 0);
         return new Color(sumR / cnt, sumG / cnt, sumB / cnt);
+    }
+    public static float validateAngle(float angle){return (float) (angle - Math.floor(angle / 360) * 360);}
+
+    public static BufferedImage cropImage(Point2D location, Dimension dimension, BufferedImage image, boolean resize){
+        if (resize) return toBufferedImage(image.getScaledInstance(dimension.width, dimension.height, Image.SCALE_SMOOTH));
+        else return image.getSubimage((int) location.getX(), (int) location.getY(),dimension.width,dimension.height);
     }
 }

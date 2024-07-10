@@ -14,10 +14,12 @@ import static view.Utils.averageTone;
 import static view.characters.GeoShapeView.getRawImage;
 
 public class DefaultMethods {
+    private DefaultMethods() {}
+
     //SIN,COS PRE-PROCESSING//
-    public static double[] sinTable = new double[360];
-    public static double[] cosTable = new double[360];
-    public static double[] radianTable = new double[360];
+    public static final double[] sinTable = new double[360];
+    public static final double[] cosTable = new double[360];
+    public static  final double[] radianTable = new double[360];
 
     static {
         for (int i = 0; i < 360; i++) {

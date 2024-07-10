@@ -10,8 +10,12 @@ public enum ViewConstants {
 
     public float getValue() {
         return switch (this) {
-            case VERTEX_RADIUS -> Profile.getCurrent().SIZE_SCALE * 6;
+            case VERTEX_RADIUS -> Profile.getCurrent().getSizeScale() * 6;
             case BASE_PAINT_OPACITY -> 0.5f;
+            case EPSILON_FACTOR -> Profile.getCurrent().getSizeScale() * 50;
+            case TRIGORATH_FACTOR -> Profile.getCurrent().getSizeScale() * 70;
+            case SQUARANTINE_FACTOR -> Profile.getCurrent().getSizeScale() * 60;
+            case BULLET_FACTOR -> Profile.getCurrent().getSizeScale() * 20;
             case EPSILON_FACTOR -> Profile.getCurrent().SIZE_SCALE * EPSILON_RADIUS;
             case TRIGORATH_FACTOR -> Profile.getCurrent().SIZE_SCALE * 70;
             case SQUARANTINE_FACTOR -> Profile.getCurrent().SIZE_SCALE * 60;

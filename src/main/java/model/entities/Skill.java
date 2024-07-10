@@ -19,15 +19,23 @@ public enum Skill {
     Aceso, Melampus, Chiron,
     Proteus, Empusa, Dolus;
 
-    public static Skill activeSkill = null;
-    public boolean acquired = false;
-    public long lastSkillTime = 0;
+    private static Skill activeSkill = null;
+    private boolean acquired = false;
+    private long lastSkillTime = 0;
 
     public static void initializeSkills() {
-        activeSkill = findSkill(Profile.getCurrent().activeSkillSaveName);
+        setActiveSkill(findSkill(Profile.getCurrent().getActiveSkillSaveName()));
         CopyOnWriteArrayList<Skill> acquiredSkillSave = new CopyOnWriteArrayList<>();
-        for (String skillName : Profile.getCurrent().acquiredSkillsNames) acquiredSkillSave.add(findSkill(skillName));
-        for (Skill skill : acquiredSkillSave) skill.acquired = true;
+        for (String skillName : Profile.getCurrent().getAcquiredSkillsNames()) acquiredSkillSave.add(findSkill(skillName));
+        for (Skill skill : acquiredSkillSave) skill.setAcquired(true);
+    }
+
+    public static Skill getActiveSkill() {
+        return activeSkill;
+    }
+
+    public static void setActiveSkill(Skill activeSkill) {
+        Skill.activeSkill = activeSkill;
     }
 
     public String getName() {
@@ -61,6 +69,9 @@ public enum Skill {
     public ActionListener getAction() {
         return switch (this) {
 
+            case ARES -> e -> {
+                Profile.getCurrent().setEpsilonMeleeDamage((int) (Profile.getCurrent().getEpsilonMeleeDamage() + WRIT_OF_ARES_BUFF_AMOUNT.getValue()));
+                Profile.getCurrent().setEpsilonRangedDamage((int) (Profile.getCurrent().getEpsilonRangedDamage() + WRIT_OF_ARES_BUFF_AMOUNT.getValue()));
             case Ares -> e -> {
                 Profile.getCurrent().EPSILON_MELEE_DAMAGE += (int) WRIT_OF_ARES_BUFF_AMOUNT.getValue();
                 Profile.getCurrent().EPSILON_RANGED_DAMAGE += (int) WRIT_OF_ARES_BUFF_AMOUNT.getValue();
@@ -98,10 +109,26 @@ public enum Skill {
 
     public void fire() {
         long now = System.nanoTime();
-        if (now - lastSkillTime >= TimeUnit.MINUTES.toNanos(SKILL_COOLDOWN_IN_MINUTES.getValue())) {
+        if (now - getLastSkillTime() >= TimeUnit.MINUTES.toNanos(SKILL_COOLDOWN_IN_MINUTES.getValue())) {
             getAction().actionPerformed(new ActionEvent(new Object(), ActionEvent.ACTION_PERFORMED, null));
-            lastSkillTime = now;
+            setLastSkillTime(now);
         }
+    }
+
+    public boolean isAcquired() {
+        return acquired;
+    }
+
+    public void setAcquired(boolean acquired) {
+        this.acquired = acquired;
+    }
+
+    public long getLastSkillTime() {
+        return lastSkillTime;
+    }
+
+    public void setLastSkillTime(long lastSkillTime) {
+        this.lastSkillTime = lastSkillTime;
     }
 
     public enum SkillType {

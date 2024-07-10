@@ -5,7 +5,7 @@ import model.Profile;
 import model.collision.Collidable;
 import model.entities.AttackTypes;
 import model.movement.Direction;
-import model.projectiles.Long_Ranged;
+import model.projectiles.LongRanged;
 import view.menu.MainMenu;
 
 import javax.swing.*;
@@ -22,27 +22,26 @@ import static controller.constants.EntityConstants.PointConstants.EPSILON_CENTER
 import static controller.constants.MovementConstants.EPSILON_SPEED;
 import static model.Utils.*;
 
-public final class EpsilonModel extends GeoShapeModel implements Long_Ranged {
-    public static boolean MOVE_UP_IND_SAVE;
-    public static boolean MOVE_DOWN_IND_SAVE;
-    public static boolean MOVE_LEFT_IND_SAVE;
-    public static boolean MOVE_RIGHT_IND_SAVE;
-    public static boolean SHOOT_IND_SAVE;
+public final class EpsilonModel extends GeoShapeModel implements LongRanged {
     private static EpsilonModel INSTANCE;
+    private boolean moveUpIndSave;
+    private boolean moveDownIndSave;
+    private boolean moveLeftIndSave;
+    private boolean moveRightIndSave;
     private int shootingRapidity = EPSILON_SHOOTING_RAPIDITY.getValue();
 
     private EpsilonModel(String motionPanelId) {
         super(new Point(0, 0), EPSILON_VERTICES.getValue(), EPSILON_HEALTH.getValue());
-        this.isCircular = true;
-        this.motionPanelId = motionPanelId;
-        this.anchorSave = deepClone(EPSILON_CENTER.getValue());
-        assert anchorSave != null;
-        createEpsilon(modelId, roundPoint(anchorSave), motionPanelId);
+        this.setCircular(true);
+        setMotionPanelId(motionPanelId);
+        this.setAnchorSave(deepClone(EPSILON_CENTER.getValue()));
+        assert getAnchorSave() != null;
+        createEpsilon(getModelId(), roundPoint(getAnchorSave()), motionPanelId);
         Point2D anchor = getMotionPanelCenterLocation(getMainMotionPanelId());
         moveShapeModel(anchor);
-        movement.setAnchor(anchor);
-        damageSize.put(AttackTypes.MELEE, Profile.getCurrent().EPSILON_MELEE_DAMAGE);
-        damageSize.put(AttackTypes.RANGED, Profile.getCurrent().EPSILON_RANGED_DAMAGE);
+        getMovement().setAnchor(anchor);
+        getDamageSize().put(AttackTypes.MELEE, Profile.getCurrent().getEpsilonMeleeDamage());
+        getDamageSize().put(AttackTypes.RANGED, Profile.getCurrent().getEpsilonRangedDamage());
         activateMovement();
     }
 
@@ -58,89 +57,86 @@ public final class EpsilonModel extends GeoShapeModel implements Long_Ranged {
     @Override
     public void eliminate() {
         super.eliminate();
-        new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) showMessage(-1)), e -> {
+        Timer timer=new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) showMessage(-1)), e -> {
             exitGame();
             MainMenu.flushINSTANCE();
             MainMenu.getINSTANCE().togglePanel();
-        }) {{
-            setRepeats(false);
-        }}.start();
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 
     public void activateMovement() {
-        movement.angularSpeed = 0;
-        movement.speed = EPSILON_SPEED.getValue();
-        movement.speedSave = EPSILON_SPEED.getValue();
+        getMovement().setAngularSpeed(0);
+        getMovement().setSpeed(EPSILON_SPEED.getValue());
+        getMovement().setSpeedSave(EPSILON_SPEED.getValue());
 
-        movement.getMoveListeners().clear();
-        movement.getMoveListeners().add(e -> {
-            movement.setDirection(new Direction(0, Direction.DirectionOrientation.positive) {{
-                isDownside = true;
-            }});
-            if (UserInputHandler.MOVE_UP_IND) {
-                MOVE_UP_IND_SAVE = true;
-                movement.dampenDecelerations();
-                movement.updateAnchor();
-            } else if (MOVE_UP_IND_SAVE) {
-                MOVE_UP_IND_SAVE = false;
-                movement.decelerate(movement.direction.clone());
+        getMovement().getMoveListeners().clear();
+        getMovement().getMoveListeners().add(e -> {
+
+            Direction downDirection=new Direction(0, Direction.DirectionOrientation.POSITIVE);
+            downDirection.setDownside(true);
+            getMovement().setDirection(downDirection);
+
+            if (UserInputHandler.getINSTANCE().isMoveUpInd()) {
+                moveUpIndSave = true;
+                getMovement().dampenDecelerations();
+                getMovement().updateAnchor();
+            } else if (moveUpIndSave) {
+                moveUpIndSave = false;
+                getMovement().decelerate(new Direction(getMovement().getDirection()));
             }
 
-            movement.setDirection(new Direction(0, Direction.DirectionOrientation.positive) {{
-                isUpside = true;
-            }});
-            if (UserInputHandler.MOVE_DOWN_IND) {
-                MOVE_DOWN_IND_SAVE = true;
-                movement.dampenDecelerations();
-                movement.updateAnchor();
-            } else if (MOVE_DOWN_IND_SAVE) {
-                MOVE_DOWN_IND_SAVE = false;
-                movement.decelerate(movement.direction.clone());
+            Direction upDirection=new Direction(0, Direction.DirectionOrientation.POSITIVE);
+            upDirection.setUpside(true);
+            getMovement().setDirection(upDirection);
+
+            if (UserInputHandler.getINSTANCE().isMoveDownInd()) {
+                moveDownIndSave = true;
+                getMovement().dampenDecelerations();
+                getMovement().updateAnchor();
+            } else if (moveDownIndSave) {
+                moveDownIndSave = false;
+                getMovement().decelerate(new Direction(getMovement().getDirection()));
             }
 
-            movement.setDirection(new Direction(0, Direction.DirectionOrientation.negative));
-            if (UserInputHandler.MOVE_LEFT_IND) {
-                MOVE_LEFT_IND_SAVE = true;
-                movement.dampenDecelerations();
-                movement.updateAnchor();
-            } else if (MOVE_LEFT_IND_SAVE) {
-                MOVE_LEFT_IND_SAVE = false;
-                movement.decelerate(movement.direction.clone());
+            getMovement().setDirection(new Direction(0, Direction.DirectionOrientation.NEGATIVE));
+            if (UserInputHandler.getINSTANCE().isMoveLeftInd()) {
+                moveLeftIndSave = true;
+                getMovement().dampenDecelerations();
+                getMovement().updateAnchor();
+            } else if (moveLeftIndSave) {
+                moveLeftIndSave = false;
+                getMovement().decelerate(new Direction(getMovement().getDirection()));
             }
 
-            movement.setDirection(new Direction(0, Direction.DirectionOrientation.positive));
-            if (UserInputHandler.MOVE_RIGHT_IND) {
-                MOVE_RIGHT_IND_SAVE = true;
-                movement.dampenDecelerations();
-                movement.updateAnchor();
-            } else if (MOVE_RIGHT_IND_SAVE) {
-                MOVE_RIGHT_IND_SAVE = false;
-                movement.decelerate(movement.direction.clone());
+            getMovement().setDirection(new Direction(0, Direction.DirectionOrientation.POSITIVE));
+            if (UserInputHandler.getINSTANCE().isMoveRightInd()) {
+                moveRightIndSave = true;
+                getMovement().dampenDecelerations();
+                getMovement().updateAnchor();
+            } else if (moveRightIndSave) {
+                moveRightIndSave = false;
+                getMovement().decelerate(new Direction(getMovement().getDirection()));
             }
-            movement.move();
+            getMovement().move();
 
             Point mouseLocation = getMouseLocation();
             Point relativeMouse = (Point) relativeLocation(mouseLocation, roundPoint(getMovement().getAnchor()));
             float mouseAngle = calculateAngle(relativeMouse);
 
-            if (UserInputHandler.SHOOT_IND) {
-                SHOOT_IND_SAVE = true;
-                shoot(this, new Direction(relativeMouse), damageSize.get(AttackTypes.RANGED));
-                UserInputHandler.SHOOT_IND = false;
+            if (UserInputHandler.getINSTANCE().isShootInd()) {
+                shoot(this, new Direction(relativeMouse), getDamageSize().get(AttackTypes.RANGED));
+                UserInputHandler.getINSTANCE().setShootInd(false);
             }
 
-            rotateShapeModel(totalRotation - mouseAngle);
+            rotateShapeModel(getTotalRotation() - mouseAngle);
         });
     }
 
     @Override
     public boolean collide(Collidable collidable) {
         return true;
-    }
-
-    @Override
-    public String getMotionPanelId() {
-        return motionPanelId;
     }
 
     @Override

@@ -5,14 +5,15 @@ import org.locationtech.jts.geom.Coordinate;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class Utils {
+    private Utils(){}
     public static boolean areInstancesOf(Object object1, Object object2, Class<?> class1, Class<?> class2) {
         return (class1.isInstance(object1) && class2.isInstance(object2)) || (class2.isInstance(object1) && class1.isInstance(object2));
     }
@@ -22,7 +23,7 @@ public class Utils {
      * @param <T>        generic class type
      * @return deep cloned thread-safe Arraylist. All objects are cloned via {@link #deepClone(Object)} method
      */
-    public static <T> CopyOnWriteArrayList<T> deepCloneList(Collection<T> collection) {
+    public static <T> List<T> deepCloneList(Collection<T> collection) {
         if (collection == null) return null;
         CopyOnWriteArrayList<T> output = new CopyOnWriteArrayList<>();
         for (T t : collection) output.add(deepClone(t));
@@ -40,42 +41,16 @@ public class Utils {
     @SuppressWarnings("unchecked")
     public static <T> T deepClone(T t) {
         Method cloneMethod;
-        try {
-            cloneMethod = t.getClass().getMethod("clone");
-        } catch (NoSuchMethodException e) {
-            return null;
-        }
+        try {cloneMethod = t.getClass().getMethod("clone");}
+        catch (NoSuchMethodException e) {return null;}
 
         if (Modifier.isPublic(cloneMethod.getModifiers())) {
-            Object cloned = null;
-            try {
-                cloned = cloneMethod.invoke(t);
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                e.printStackTrace();
-            }
+            Object cloned;
+            try {cloned = cloneMethod.invoke(t);}
+            catch (IllegalAccessException | InvocationTargetException e) {throw new UnsupportedOperationException("Failed to clone instance of class: "+t.getClass().getName());}
             return (T) cloned;
         }
         return null;
-    }
-
-    /**
-     * Copies all accessible fields of {@code t1} into {@code t2}
-     * <p>Note : Exception is suppressed by try/catch since it is checked beforehand that the fields are accessible</p>
-     *
-     * @param t1  object of type {@code T}
-     * @param t2  object of type {@code T}
-     * @param <T> generic class type
-     */
-    public static <T> void deepCopy(T t1, T t2) {
-        for (Field field : t1.getClass().getFields()) {
-            if (field.canAccess(t1) && field.canAccess(t2)) {
-                try {
-                    field.set(t2, field.get(t1));
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
     /**
@@ -84,9 +59,9 @@ public class Utils {
      * @param angle  the rotation angle passed in degrees
      * @return the rotation of {@code point} about {@code anchor} with magnitude of {@code angle}
      */
-    public static Point2D rotateAbout(Point2D point, Point2D anchor, double angle) {
+    public static Point2D rotateAbout(Point2D point, Point2D anchor, float angle) {
         Point2D.Float translated = new Point2D.Float((float) (point.getX() - anchor.getX()), (float) (point.getY() - anchor.getY()));
-        float angleModified = (float) (angle - Math.floor(angle / 360) * 360);
+        float angleModified = validateAngle(angle);
         float rotatedX = (float) (translated.x * DefaultMethods.cosTable[(int) angleModified] - translated.y * DefaultMethods.sinTable[(int) angleModified]);
         float rotatedY = (float) (translated.x * DefaultMethods.sinTable[(int) angleModified] + translated.y * DefaultMethods.cosTable[(int) angleModified]);
         Point2D.Float rotated = new Point2D.Float(rotatedX, rotatedY);
@@ -103,8 +78,7 @@ public class Utils {
     public static float calculateAngle(Point2D point) {
         if (point.getX() == 0 && point.getY() == 0) return 0;
         float angle = (float) Math.toDegrees(Math.atan2(point.getY(), point.getX()));
-        angle = (float) (angle - Math.floor(angle / 360) * 360);
-        return angle;
+        return validateAngle(angle);
     }
 
     /**
@@ -177,4 +151,6 @@ public class Utils {
     public static Coordinate toCoordinate(Point2D point2D) {
         return new Coordinate(point2D.getX(), point2D.getY());
     }
+
+    public static float validateAngle(float angle){return (float) (angle - Math.floor(angle / 360) * 360);}
 }

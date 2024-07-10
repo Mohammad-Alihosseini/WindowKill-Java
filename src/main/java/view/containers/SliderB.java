@@ -1,33 +1,25 @@
-package view.base;
+package view.containers;
 
 import view.Utils;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicSliderUI;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 import static controller.constants.FilePaths.SLIDER_UI_PATH;
 import static controller.constants.UIConstants.*;
-import static view.Utils.bufferedImageClone;
-import static view.Utils.darkenImage;
+import static view.Utils.*;
 
 public class SliderB extends JSlider {
-    public BufferedImage imageSave;
-    public Container container;
-    public JLabel backgroundLabel;
-    public ButtonB labelButton;
+    private transient BufferedImage imageSave;
+    private final Container container;
+    private JLabel backgroundLabel;
+    private ButtonB labelButton;
 
     public SliderB(Container container, float minimum, float maximum, float current, String name) {
+        imageSave=toBufferedImage(SLIDER_UI_PATH.getValue());
         this.container = container;
-        try {
-            imageSave = ImageIO.read(new File(SLIDER_UI_PATH.getValue()));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
         setFocusable(false);
         setOpaque(false);
         setMinimum((int) (SLIDER_PRECISION_SCALE.getValue() * minimum));
@@ -40,8 +32,8 @@ public class SliderB extends JSlider {
     }
 
     public void setupLabel(String name) {
-        labelButton = new ButtonB(ButtonB.ButtonType.small_field_button, name, (int) SLIDER_LABEL_WIDTH.getValue(),
-                SLIDER_LABEL_FONT_SIZE.getValue(), true, false);
+        labelButton = new ButtonB(ButtonB.ButtonType.SMALL_FIELD_BUTTON, name, (int) SLIDER_LABEL_WIDTH.getValue(),
+                SLIDER_LABEL_FONT_SIZE.getValue(), false, true);
     }
 
     public void setupSliderB() {
@@ -50,7 +42,7 @@ public class SliderB extends JSlider {
         BufferedImage resized = Utils.toBufferedImage(imageSave.getScaledInstance(desiredDimension.width, desiredDimension.height, Image.SCALE_SMOOTH));
         this.imageSave = bufferedImageClone(resized);
         backgroundLabel = new JLabel(new ImageIcon(resized));
-        setUI(new customSliderUI(this));
+        setUI(new CustomSliderUI(this));
         fireStateChanged();
     }
 
@@ -66,15 +58,11 @@ public class SliderB extends JSlider {
         return super.getValue() / SLIDER_PRECISION_SCALE.getValue();
     }
 
-    public void setPreciseValue(float value) {
-        super.setValue((int) (value * SLIDER_PRECISION_SCALE.getValue()));
-    }
-
     @Override
     public void repaint() {
         super.repaint();
-        if (container != null && container.getLayout() instanceof GridBagLayout) {
-            GridBagConstraints constraints = ((GridBagLayout) container.getLayout()).getConstraints(this);
+        if (container != null && container.getLayout() instanceof GridBagLayout gridBagLayout) {
+            GridBagConstraints constraints = gridBagLayout.getConstraints(this);
             if (constraints.gridx >= 0 || constraints.gridy >= 0) {
                 if (backgroundLabel != null) {
                     progress((float) (getValue() - getMinimum()) / (getMaximum() - getMinimum()));
@@ -85,9 +73,13 @@ public class SliderB extends JSlider {
         revalidate();
     }
 
-    public static class customSliderUI extends BasicSliderUI {
+    public ButtonB getLabelButton() {
+        return labelButton;
+    }
 
-        public customSliderUI(JSlider sliderB) {
+    public static class CustomSliderUI extends BasicSliderUI {
+
+        public CustomSliderUI(JSlider sliderB) {
             super(sliderB);
             this.thumbRect = new Rectangle(5, 10);
         }
