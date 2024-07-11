@@ -22,7 +22,9 @@ public class MotionPanelView extends PanelB {
     private String viewId;
 
     public MotionPanelView(Dimension size, Point location) {
-        super(size.width, size.height, toBufferedImage(GAME_BACKGROUND_PATH.getValue()));
+        super(size.width, size.height, null);
+        // todo use this line
+        // super(size.width, size.height, toBufferedImage(GAME_BACKGROUND_PATH.getValue()));
 
         if (getMainMotionPanelView() == null) setMainMotionPanelView(this);
         setBackground(new Color(0, 0, 0, 0));
