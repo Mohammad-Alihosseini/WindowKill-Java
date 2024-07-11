@@ -10,9 +10,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static controller.UserInterfaceController.isGameOn;
 import static controller.constants.DefaultMethods.getCenterOffset;
-import static controller.constants.FilePaths.GAME_BACKGROUND_PATH;
 import static controller.constants.ViewConstants.VERTEX_RADIUS;
-import static view.Utils.toBufferedImage;
 import static view.containers.GlassFrame.getGlassFrame;
 
 public class MotionPanelView extends PanelB {

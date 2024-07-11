@@ -63,6 +63,7 @@ public class WaveManager {
                     case 0 -> new SquarantineModel(location, getMainMotionPanelId());
                     case 1 -> new TrigorathModel(location, getMainMotionPanelId());
                     case 2 -> new OmenoctModel(location, getMainMotionPanelId());
+                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
                     default -> null;
                 };
             }

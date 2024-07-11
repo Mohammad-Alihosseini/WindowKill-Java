@@ -61,6 +61,11 @@ public abstract class UserInterfaceController {
         view.setViewId(modelId);
     }
 
+    public static void createNecropick(String modelId, Point anchor, String motionPanelId) {
+        NecropickView view = new NecropickView(anchor, findMotionPanelView(motionPanelId));
+        view.setViewId(modelId);
+    }
+
     public static void createCollectible(String modelId, String ancestorId, int value, Point anchor, String motionPanelId) {
         CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), findMotionPanelView(motionPanelId));
         collectibleView.setViewId(modelId);
