@@ -1,20 +1,21 @@
 package model;
 
-import model.characters.EpsilonModel;
-import model.characters.GeoShapeModel;
-import model.characters.SquarantineModel;
-import model.characters.TrigorathModel;
+import model.characters.*;
 import model.movement.Direction;
+import org.locationtech.jts.geom.Coordinate;
+import view.containers.MotionPanelView;
 import view.menu.MainMenu;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.*;
+import static controller.constants.DimensionConstants.OMENOCT_DIMENSION;
 import static controller.constants.WaveConstants.MAX_ENEMY_SPAWN_RADIUS;
 import static controller.constants.WaveConstants.MIN_ENEMY_SPAWN_RADIUS;
 import static model.Utils.*;
@@ -30,8 +31,22 @@ public class WaveManager {
 
     public void lockEnemies() {
         for (GeoShapeModel model : waveEntities) {
-            if (!(model instanceof EpsilonModel)) {
+            if (model instanceof SquarantineModel || model instanceof TrigorathModel) {
                 model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
+            } else if (model instanceof OmenoctModel) {
+                int offset = random.nextInt(50, 250);
+                //todo set target to motion panel
+                Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), e -> {
+                    if (MotionPanelView.getMainMotionPanelView() != null) {
+                        Coordinate[] coordinates = MotionPanelModel.getMainMotionPanelModel().getGeometry().getCoordinates();
+                        Point2D target = new Point2D.Double(
+                                coordinates[1].x - OMENOCT_DIMENSION.getValue().height + 10,
+                                coordinates[1].y + offset
+                        );
+                        model.getMovement().lockOnTarget(target);
+                    }
+                });
+                timer.start();
             }
         }
     }
@@ -44,9 +59,10 @@ public class WaveManager {
             GeoShapeModel model;
             if (wave == 0) model = new SquarantineModel(location, getMainMotionPanelId());
             else {
-                model = switch (random.nextInt(0, 2)) {
+                model = switch (random.nextInt(0, 3)) {
                     case 0 -> new SquarantineModel(location, getMainMotionPanelId());
                     case 1 -> new TrigorathModel(location, getMainMotionPanelId());
+                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
                     default -> null;
                 };
             }

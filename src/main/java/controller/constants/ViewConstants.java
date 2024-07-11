@@ -4,7 +4,7 @@ import model.Profile;
 
 public enum ViewConstants {
     VERTEX_RADIUS, BASE_PAINT_OPACITY, EPSILON_FACTOR, TRIGORATH_FACTOR,
-    SQUARANTINE_FACTOR, BULLET_FACTOR, COLLECTIBLE_SIZE_OFFSET;
+    SQUARANTINE_FACTOR, OMENOCT_FACTOR, BULLET_FACTOR, COLLECTIBLE_SIZE_OFFSET;
 
     public float getValue() {
         return switch (this) {
@@ -13,6 +13,7 @@ public enum ViewConstants {
             case EPSILON_FACTOR -> Profile.getCurrent().getSizeScale() * 50;
             case TRIGORATH_FACTOR -> Profile.getCurrent().getSizeScale() * 70;
             case SQUARANTINE_FACTOR -> Profile.getCurrent().getSizeScale() * 60;
+            case OMENOCT_FACTOR -> Profile.getCurrent().getSizeScale() * 72;
             case BULLET_FACTOR -> Profile.getCurrent().getSizeScale() * 20;
             case COLLECTIBLE_SIZE_OFFSET -> 9;
         };

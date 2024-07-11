@@ -9,6 +9,7 @@ import model.collision.Collidable;
 import model.entities.Ability;
 import model.entities.Skill;
 import model.movement.Movable;
+import model.projectiles.ShooterEntity;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import view.characters.*;
@@ -28,6 +29,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static controller.AudioHandler.clips;
+import static controller.constants.FilePaths.*;
 import static model.MotionPanelModel.*;
 import static model.Utils.*;
 import static model.characters.GeoShapeModel.allShapeModelsList;
@@ -54,13 +56,24 @@ public abstract class UserInterfaceController {
         view.setViewId(modelId);
     }
 
+    public static void createOmenoct(String modelId, Point anchor, String motionPanelId) {
+        OmenoctView view = new OmenoctView(anchor, findMotionPanelView(motionPanelId));
+        view.setViewId(modelId);
+    }
+
     public static void createCollectible(String modelId, String ancestorId, int value, Point anchor, String motionPanelId) {
         CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), findMotionPanelView(motionPanelId));
         collectibleView.setViewId(modelId);
     }
 
-    public static void createBullet(String modelId, Point referenceAnchor, String motionPanelId) {
-        BulletView view = new BulletView(referenceAnchor, findMotionPanelView(motionPanelId));
+    public static void createBullet(String modelId, Point referenceAnchor, String motionPanelId, ShooterEntity shooter) {
+        String path;
+        switch (shooter) {
+            case Epsilon -> path = EPSILON_BULLET_IMAGEPATH.getValue();
+            case Omenoct -> path = OMENOCT_BULLET_IMAGEPATH.getValue();
+            default -> path = BULLET_IMAGEPATH.getValue();
+        }
+        BulletView view = new BulletView(referenceAnchor, findMotionPanelView(motionPanelId), path);
         view.setViewId(modelId);
     }
 

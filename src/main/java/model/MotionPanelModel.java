@@ -70,6 +70,8 @@ public class MotionPanelModel implements Collidable, Movable {
      */
     public static float evaluateProgress(float distance, float velocity) {
         float prog = distance * velocity;
+        //If Math.abs(prog) < Math.abs(distance) is true, then prog is assigned to prog.
+        //If Math.abs(prog) >= Math.abs(distance) is true, then distance is assigned to prog.
         prog = Math.abs(prog) < Math.abs(distance) ? prog : distance;
         return prog;
     }

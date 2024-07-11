@@ -6,7 +6,8 @@ import java.awt.geom.Point2D;
 import static controller.constants.ViewConstants.*;
 
 public enum DimensionConstants {
-    SCREEN_SIZE, EPSILON_DIMENSION, TRIGORATH_DIMENSION, SQUARANTINE_DIMENSION, BULLET_DIMENSION, LOGIN_PAGE_DIMENSION,
+    SCREEN_SIZE, EPSILON_DIMENSION, TRIGORATH_DIMENSION, SQUARANTINE_DIMENSION, OMENOCT_DIMENSION, BULLET_DIMENSION,
+    LOGIN_PAGE_DIMENSION,
     MAIN_MENU_DIMENSION, SETTINGS_MENU_DIMENSION, SKILL_TREE_DIMENSION, PAUSE_MENU_DIMENSION, FPS_COUNTER_DIMENSION;
 
     public Dimension getValue() {
@@ -18,6 +19,7 @@ public enum DimensionConstants {
                     new Dimension((int) (TRIGORATH_FACTOR.getValue() * Math.sqrt(3) / 2), (int) TRIGORATH_FACTOR.getValue());
             case SQUARANTINE_DIMENSION ->
                     new Dimension((int) SQUARANTINE_FACTOR.getValue(), (int) SQUARANTINE_FACTOR.getValue());
+            case OMENOCT_DIMENSION -> new Dimension((int) OMENOCT_FACTOR.getValue(), (int) OMENOCT_FACTOR.getValue());
             case BULLET_DIMENSION -> new Dimension((int) BULLET_FACTOR.getValue(), (int) BULLET_FACTOR.getValue());
             case LOGIN_PAGE_DIMENSION -> new Dimension(750, 400);
             case MAIN_MENU_DIMENSION -> new Dimension(700, 800);

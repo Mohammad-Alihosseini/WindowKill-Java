@@ -14,13 +14,13 @@ import static model.Utils.deepClone;
 import static model.Utils.roundPoint;
 
 public class BulletModel extends GeoShapeModel {
-    public BulletModel(Point anchor, String motionPanelId, int damage) {
+    public BulletModel(Point anchor, String motionPanelId, int damage, ShooterEntity shooter) {
         super(new Point(0, 0), BULLET_VERTICES.getValue(), BULLET_HEALTH.getValue());
         this.setCircular(true);
         setMotionPanelId(motionPanelId);
         this.setAnchorSave(deepClone(BULLET_CENTER.getValue()));
         assert getAnchorSave() != null;
-        createBullet(getModelId(), roundPoint(getAnchorSave()), motionPanelId);
+        createBullet(getModelId(), roundPoint(getAnchorSave()), motionPanelId, shooter);
         moveShapeModel(anchor);
         getMovement().setAnchor(anchor);
         getMovement().setAngularSpeed(0);

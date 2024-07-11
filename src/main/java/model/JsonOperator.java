@@ -16,6 +16,7 @@ import static controller.constants.UIMessageConstants.SAVE_FILE_EXTENSION;
 public abstract class JsonOperator {
     private static boolean proceedToSaveLoad = true;
     private static File saveFile = null;
+
     private JsonOperator() {
     }
 
