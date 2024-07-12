@@ -2,6 +2,7 @@ package model;
 
 import model.characters.*;
 import model.movement.Direction;
+import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Coordinate;
 import view.containers.MotionPanelView;
 import view.menu.MainMenu;
@@ -16,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.*;
 import static controller.constants.DimensionConstants.OMENOCT_DIMENSION;
+import static controller.constants.EntityConstants.NECROPICK_DISTANCE_FROM_EPSILON;
 import static controller.constants.WaveConstants.MAX_ENEMY_SPAWN_RADIUS;
 import static controller.constants.WaveConstants.MIN_ENEMY_SPAWN_RADIUS;
 import static model.Utils.*;
@@ -24,6 +26,43 @@ public class WaveManager {
     public static final Random random = new Random();
     public final List<Integer> waveCount = Profile.getCurrent().getWaveEnemyCount();
     private final List<GeoShapeModel> waveEntities = new CopyOnWriteArrayList<>();
+
+    @NotNull
+    private static Timer getNecropickTimer(GeoShapeModel model) {
+        // todo radius of epsilon
+        Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), null);
+        timer.addActionListener(e -> {
+            if (MotionPanelView.getMainMotionPanelView() != null) {
+                Point2D target = new Point2D.Double(
+                        EpsilonModel.getINSTANCE().getAnchor().getX() + NECROPICK_DISTANCE_FROM_EPSILON.getValue(),
+                        EpsilonModel.getINSTANCE().getAnchor().getY() + NECROPICK_DISTANCE_FROM_EPSILON.getValue()
+                );
+                model.getMovement().lockOnTarget(target);
+            } else {
+                timer.stop();
+            }
+        });
+        return timer;
+    }
+
+    @NotNull
+    private static Timer getOmenoctTimer(GeoShapeModel model, int offset) {
+        //todo set target to motion panel
+        Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), null);
+        timer.addActionListener(e -> {
+            if (MotionPanelView.getMainMotionPanelView() != null) {
+                Coordinate[] coordinates = MotionPanelModel.getMainMotionPanelModel().getGeometry().getCoordinates();
+                Point2D target = new Point2D.Double(
+                        coordinates[1].x - OMENOCT_DIMENSION.getValue().height + 10,
+                        coordinates[1].y + offset
+                );
+                model.getMovement().lockOnTarget(target);
+            } else {
+                timer.stop();
+            }
+        });
+        return timer;
+    }
 
     public void start() {
         initiateWave(0);
@@ -35,17 +74,10 @@ public class WaveManager {
                 model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
             } else if (model instanceof OmenoctModel) {
                 int offset = random.nextInt(50, 250);
-                //todo set target to motion panel
-                Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), e -> {
-                    if (MotionPanelView.getMainMotionPanelView() != null) {
-                        Coordinate[] coordinates = MotionPanelModel.getMainMotionPanelModel().getGeometry().getCoordinates();
-                        Point2D target = new Point2D.Double(
-                                coordinates[1].x - OMENOCT_DIMENSION.getValue().height + 10,
-                                coordinates[1].y + offset
-                        );
-                        model.getMovement().lockOnTarget(target);
-                    }
-                });
+                Timer timer = getOmenoctTimer(model, offset);
+                timer.start();
+            } else if (model instanceof NecropickModel) {
+                Timer timer = getNecropickTimer(model);
                 timer.start();
             }
         }
@@ -59,11 +91,11 @@ public class WaveManager {
             GeoShapeModel model;
             if (wave == 0) model = new SquarantineModel(location, getMainMotionPanelId());
             else {
-                model = switch (random.nextInt(0, 3)) {
+                model = switch (random.nextInt(0, 4)) {
                     case 0 -> new SquarantineModel(location, getMainMotionPanelId());
                     case 1 -> new TrigorathModel(location, getMainMotionPanelId());
-                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
-                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
+                    case 2, 3 -> new OmenoctModel(location, getMainMotionPanelId());
+                    case 4 -> new NecropickModel(location, getMainMotionPanelId());
                     default -> null;
                 };
             }

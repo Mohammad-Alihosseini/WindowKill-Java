@@ -1,5 +1,5 @@
 package model.projectiles;
 
 public enum ShooterEntity {
-    Epsilon, Omenoct
+    Epsilon, Omenoct, Necropick
 }

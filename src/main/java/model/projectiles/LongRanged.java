@@ -38,13 +38,13 @@ public interface LongRanged extends Collidable {
         rapidFire.start();
     }
 
-    default void hoveringShoot(GeoShapeModel shooter, Direction direction, int damage) {
-        new OmenoctBullet(roundPoint(getAnchor()), getMotionPanelId(), damage) {
+    default void hoveringShoot(GeoShapeModel shooter, Direction direction, int damage, ShooterEntity enemy) {
+        new EnemyBullet(roundPoint(getAnchor()), getMotionPanelId(), damage, enemy) {
             @Override
             public boolean collide(Collidable collidable) {
                 boolean one = !(collidable instanceof BulletModel) && collidable != shooter;
-                boolean two = !(collidable instanceof MotionPanelModel) && collidable != shooter;
-                boolean three = !(collidable instanceof Enemy) && collidable != shooter;
+                boolean two = !(collidable instanceof MotionPanelModel);
+                boolean three = !(collidable instanceof Enemy);
                 return one && two && three;
             }
         }.getMovement().setDirection(direction);

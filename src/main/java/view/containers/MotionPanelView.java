@@ -10,7 +10,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static controller.UserInterfaceController.isGameOn;
 import static controller.constants.DefaultMethods.getCenterOffset;
+import static controller.constants.FilePaths.GAME_BACKGROUND_PATH;
 import static controller.constants.ViewConstants.VERTEX_RADIUS;
+import static view.Utils.toBufferedImage;
 import static view.containers.GlassFrame.getGlassFrame;
 
 public class MotionPanelView extends PanelB {
@@ -20,9 +22,9 @@ public class MotionPanelView extends PanelB {
     private String viewId;
 
     public MotionPanelView(Dimension size, Point location) {
-        super(size.width, size.height, null);
+//        super(size.width, size.height, null);
         // todo use this line
-        // super(size.width, size.height, toBufferedImage(GAME_BACKGROUND_PATH.getValue()));
+        super(size.width, size.height, toBufferedImage(GAME_BACKGROUND_PATH.getValue()));
 
         if (getMainMotionPanelView() == null) setMainMotionPanelView(this);
         setBackground(new Color(0, 0, 0, 0));
@@ -58,8 +60,11 @@ public class MotionPanelView extends PanelB {
             shapeView.getRotatedIcon().paintIcon(this, g, 0, 0);
             if (isGameOn()) {
                 for (Point point : shapeView.getVertexLocations()) {
-                    g.fillOval((int) (point.x - getCenterOffset(VERTEX_RADIUS.getValue())), (int) (point.y - getCenterOffset(VERTEX_RADIUS.getValue())),
-                            (int) VERTEX_RADIUS.getValue(), (int) VERTEX_RADIUS.getValue());
+                    g.fillOval(
+                            (int) (point.x - getCenterOffset(VERTEX_RADIUS.getValue())),
+                            (int) (point.y - getCenterOffset(VERTEX_RADIUS.getValue())),
+                            (int) VERTEX_RADIUS.getValue(), (int) VERTEX_RADIUS.getValue()
+                    );
                 }
             }
         }

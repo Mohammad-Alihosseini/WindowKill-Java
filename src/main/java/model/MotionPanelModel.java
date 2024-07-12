@@ -30,11 +30,6 @@ public class MotionPanelModel implements Collidable, Movable {
     private static MotionPanelModel mainMotionPanelModel;
     public final List<ActionListener> deformationListeners = new CopyOnWriteArrayList<>();
     private final String modelId;
-    /**
-     * Since there is not a well-structured non-abstract class for high-precision {@link Dimension} in Java/JTS the choice is
-     * made to use an instance of Point2D instead of Dimension to do the floating-point arithmetic and calculations
-     * of motion panel to avoid stack-up of quantitative errors throughout rapid calls
-     */
     private Point2D location;
     private long lastPositionUpdateTime = System.nanoTime();
     private long positionUpdateTimeDiffCapture = 0;

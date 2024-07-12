@@ -48,8 +48,16 @@ public class RotatedIcon implements Icon {
 
         Graphics2D g2d = (Graphics2D) g.create();
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setClip(relativeIconCorner.x, relativeIconCorner.y, upperX - relativeIconCorner.x, upperY - relativeIconCorner.y);
-        g2d.rotate(radianTable[(int) validateAngle(getDegrees())], (double) relativeCorner.x + getRotationAnchor().x, (double) relativeCorner.y + getRotationAnchor().y);
+        g2d.setClip(
+                relativeIconCorner.x, relativeIconCorner.y,
+                upperX - relativeIconCorner.x,
+                upperY - relativeIconCorner.y
+        );
+        g2d.rotate(
+                radianTable[(int) validateAngle(getDegrees())],
+                (double) relativeCorner.x + getRotationAnchor().x,
+                (double) relativeCorner.y + getRotationAnchor().y
+        );
         g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getOpacity()));
         getIcon().paintIcon(c, g2d, relativeCorner.x, relativeCorner.y);
         g2d.dispose();

@@ -76,6 +76,7 @@ public abstract class UserInterfaceController {
         switch (shooter) {
             case Epsilon -> path = EPSILON_BULLET_IMAGEPATH.getValue();
             case Omenoct -> path = OMENOCT_BULLET_IMAGEPATH.getValue();
+            case Necropick -> path = NECROPICK_BULLET_IMAGEPATH.getValue();
             default -> path = BULLET_IMAGEPATH.getValue();
         }
         BulletView view = new BulletView(referenceAnchor, findMotionPanelView(motionPanelId), path);
@@ -98,6 +99,19 @@ public abstract class UserInterfaceController {
         allShapeViewsList.remove(shapeView);
         MotionPanelView motionPanelView = findMotionPanelView(motionPanelId);
         if (motionPanelView != null) motionPanelView.shapeViews.remove(shapeView);
+    }
+
+    public static void toggleView(String modelId, String motionPanelId, boolean isPrinted) {
+        GeoShapeView shapeView = findView(modelId);
+        MotionPanelView motionPanelView = findMotionPanelView(motionPanelId);
+        if (isPrinted) {
+            if (motionPanelView != null) motionPanelView.shapeViews.remove(shapeView);
+        } else {
+            assert shapeView != null;
+            shapeView.setViewId(modelId);
+            assert motionPanelView != null;
+            motionPanelView.shapeViews.add(shapeView);
+        }
     }
 
     public static void fireSkill() {

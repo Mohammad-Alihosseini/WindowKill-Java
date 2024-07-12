@@ -12,8 +12,8 @@ public enum EntityConstants {
     EPSILON_HEALTH, SHOTS_PER_SECOND, SKILL_COOLDOWN_IN_MINUTES, COLLECTIBLE_LIFE_TIME, EPSILON_RAPID_SHOOTING_DELAY,
     EPSILON_SHOOTING_RAPIDITY, ENEMY_SHOUTING_RAPIDITY, TRIGORATH_MELEE_DAMAGE, SQUARANTINE_MELEE_DAMAGE,
     TRIGORATH_HEALTH, SQUARANTINE_HEALTH, WYRM_HEALTH, BARRICADOS_HEALTH, NECROPICK_HEALTH, ARCHMIRE_HEALTH, OMENOCT_HEALTH,
-    BULLET_HEALTH, COLLECTIBLE_HEALTH,
-    OMENOCT_MELEE, OMENOCT_RANGED, NECROPICK_RANGED;
+    BULLET_HEALTH, COLLECTIBLE_HEALTH, NECROPICK_DISTANCE_FROM_EPSILON,
+    OMENOCT_MELEE, OMENOCT_RANGED, NECROPICK_RANGED, NECROPICK_MELEE;
 
     public int getValue() {
         return switch (this) {
@@ -36,7 +36,9 @@ public enum EntityConstants {
             case COLLECTIBLE_LIFE_TIME -> 8;
             case OMENOCT_MELEE -> 8;
             case OMENOCT_RANGED -> 4;
-            case NECROPICK_RANGED -> 5;
+            case NECROPICK_RANGED -> 0;
+            case NECROPICK_MELEE -> 0;
+            case NECROPICK_DISTANCE_FROM_EPSILON -> (int) Profile.getCurrent().getSizeScale() * 120;
         };
     }
 
@@ -73,8 +75,8 @@ public enum EntityConstants {
                 case NECROPICK_VERTICES -> new CopyOnWriteArrayList<>(
                         List.of(new Point2D.Float(OMENOCT_DIMENSION.getValue().width / 2F, 0),
                                 new Point2D.Float(OMENOCT_DIMENSION.getValue().width / 2F, OMENOCT_DIMENSION.getValue().height),
-                                new Point2D.Float(0, 2 * OMENOCT_DIMENSION.getValue().height / 3F),
-                                new Point2D.Float(OMENOCT_DIMENSION.getValue().width, 2 * OMENOCT_DIMENSION.getValue().height / 3F)
+                                new Point2D.Float(0, OMENOCT_DIMENSION.getValue().height / 5F),
+                                new Point2D.Float(OMENOCT_DIMENSION.getValue().width, OMENOCT_DIMENSION.getValue().height / 5F)
                         ));
             };
         }

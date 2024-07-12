@@ -233,8 +233,16 @@ public class Movement {
         return deceleration;
     }
 
+    public void setDeceleration(float deceleration) {
+        this.deceleration = deceleration;
+    }
+
     public float getDecay() {
         return decay;
+    }
+
+    public void setDecay(float decay) {
+        this.decay = decay;
     }
 
     public String getModelId() {

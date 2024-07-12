@@ -3,6 +3,7 @@ package model.characters;
 import model.entities.AttackTypes;
 import model.movement.Direction;
 import model.projectiles.LongRanged;
+import model.projectiles.ShooterEntity;
 import view.containers.MotionPanelView;
 
 import javax.swing.*;
@@ -41,10 +42,11 @@ public class OmenoctModel extends GeoShapeModel implements LongRanged, Enemy {
         timer.start();
     }
 
-    public void activateShooting() {
+    private void activateShooting() {
         Point2D epsilonAnchor = EpsilonModel.getINSTANCE().getAnchor();
         Point2D relativeLocation = relativeLocation(epsilonAnchor, roundPoint(getMovement().getAnchor()));
-        hoveringShoot(this, new Direction(relativeLocation), getDamageSize().get(AttackTypes.RANGED));
+        hoveringShoot(this, new Direction(relativeLocation),
+                getDamageSize().get(AttackTypes.RANGED), ShooterEntity.Omenoct);
     }
 
     @Override
