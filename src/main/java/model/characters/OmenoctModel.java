@@ -51,8 +51,8 @@ public class OmenoctModel extends GeoShapeModel implements LongRanged, Enemy {
 
     @Override
     public void eliminate() {
-        super.eliminate();
         timer.stop();
+        super.eliminate();
     }
 
     @Override

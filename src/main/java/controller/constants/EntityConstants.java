@@ -10,10 +10,15 @@ import static controller.constants.DimensionConstants.*;
 
 public enum EntityConstants {
     EPSILON_HEALTH, SHOTS_PER_SECOND, SKILL_COOLDOWN_IN_MINUTES, COLLECTIBLE_LIFE_TIME, EPSILON_RAPID_SHOOTING_DELAY,
-    EPSILON_SHOOTING_RAPIDITY, ENEMY_SHOUTING_RAPIDITY, TRIGORATH_MELEE_DAMAGE, SQUARANTINE_MELEE_DAMAGE,
-    TRIGORATH_HEALTH, SQUARANTINE_HEALTH, WYRM_HEALTH, BARRICADOS_HEALTH, NECROPICK_HEALTH, ARCHMIRE_HEALTH, OMENOCT_HEALTH,
-    BULLET_HEALTH, COLLECTIBLE_HEALTH, NECROPICK_DISTANCE_FROM_EPSILON,
-    OMENOCT_MELEE, OMENOCT_RANGED, NECROPICK_RANGED, NECROPICK_MELEE;
+    EPSILON_SHOOTING_RAPIDITY, ENEMY_SHOUTING_RAPIDITY,
+    TRIGORATH_MELEE_DAMAGE, SQUARANTINE_MELEE_DAMAGE, TRIGORATH_HEALTH, SQUARANTINE_HEALTH,
+    WYRM_HEALTH, BARRICADOS_HEALTH, NECROPICK_HEALTH, ARCHMIRE_HEALTH, OMENOCT_HEALTH,
+    BULLET_HEALTH, COLLECTIBLE_HEALTH,
+    ARCHMIRE_MELEE,
+    //    ARCHMIRE_AOE, ARCHMIRE_DROWN,
+    ARCHMIRE_PATH_LIFE_TIME, ARCHMIRE_PATH_MELEE,
+    OMENOCT_MELEE, OMENOCT_RANGED,
+    NECROPICK_RANGED, NECROPICK_MELEE, NECROPICK_DISTANCE_FROM_EPSILON;
 
     public int getValue() {
         return switch (this) {
@@ -34,6 +39,11 @@ public enum EntityConstants {
             case OMENOCT_HEALTH -> 20;
             case BULLET_HEALTH, COLLECTIBLE_HEALTH -> 0;
             case COLLECTIBLE_LIFE_TIME -> 8;
+            case ARCHMIRE_MELEE -> 10;
+//            case ARCHMIRE_AOE -> 2;
+//            case ARCHMIRE_DROWN -> 10;
+            case ARCHMIRE_PATH_LIFE_TIME -> 5;
+            case ARCHMIRE_PATH_MELEE -> 2;
             case OMENOCT_MELEE -> 8;
             case OMENOCT_RANGED -> 4;
             case NECROPICK_RANGED -> 0;
@@ -44,6 +54,7 @@ public enum EntityConstants {
 
     public enum EntityVertices {
         TRIGORATH_VERTICES, SQUARANTINE_VERTICES, OMENOCT_VERTICES, BULLET_VERTICES, EPSILON_VERTICES,
+        ARCHMIRE_VERTICES, MINIARCHMIRE_VERTICES,
         COLLECTIBLE_VERTICES, NECROPICK_VERTICES;
 
         public List<Point2D> getValue() {
@@ -55,11 +66,13 @@ public enum EntityConstants {
                         List.of(new Point2D.Float(0, 0),
                                 new Point2D.Float(0, TRIGORATH_DIMENSION.getValue().height),
                                 new Point2D.Float(TRIGORATH_DIMENSION.getValue().width, TRIGORATH_DIMENSION.getValue().height / 2F)));
+
                 case SQUARANTINE_VERTICES -> new CopyOnWriteArrayList<>(
                         List.of(new Point2D.Float(0, 0),
                                 new Point2D.Float(0, SQUARANTINE_DIMENSION.getValue().height),
                                 new Point2D.Float(SQUARANTINE_DIMENSION.getValue().width, SQUARANTINE_DIMENSION.getValue().height),
                                 new Point2D.Float(SQUARANTINE_DIMENSION.getValue().width, 0)));
+
                 case OMENOCT_VERTICES -> new CopyOnWriteArrayList<>(
                         List.of(new Point2D.Float(1 * octagonSide, 0),
                                 new Point2D.Float(2 * octagonSide, 0),
@@ -70,7 +83,19 @@ public enum EntityConstants {
                                 new Point2D.Float(1 * octagonSide, 3 * octagonSide),
                                 new Point2D.Float(2 * octagonSide, 3 * octagonSide)
                         ));
-                case BULLET_VERTICES, EPSILON_VERTICES, COLLECTIBLE_VERTICES -> new CopyOnWriteArrayList<>();
+                case ARCHMIRE_VERTICES -> new CopyOnWriteArrayList<>(
+                        List.of(new Point2D.Float(ARCHMIRE_DIMENSION.getValue().width / 2F, 0),
+                                new Point2D.Float(ARCHMIRE_DIMENSION.getValue().width / 2F, ARCHMIRE_DIMENSION.getValue().height),
+                                new Point2D.Float(0, 4 * ARCHMIRE_DIMENSION.getValue().height / 5F),
+                                new Point2D.Float(ARCHMIRE_DIMENSION.getValue().width, 4 * ARCHMIRE_DIMENSION.getValue().height / 5F)
+                        ));
+
+                case MINIARCHMIRE_VERTICES -> new CopyOnWriteArrayList<>(
+                        List.of(new Point2D.Float(MINIARCHMIRE_DIMENSION.getValue().width / 2F, 0),
+                                new Point2D.Float(MINIARCHMIRE_DIMENSION.getValue().width / 2F, MINIARCHMIRE_DIMENSION.getValue().height),
+                                new Point2D.Float(0, 4 * MINIARCHMIRE_DIMENSION.getValue().height / 5F),
+                                new Point2D.Float(MINIARCHMIRE_DIMENSION.getValue().width, 4 * MINIARCHMIRE_DIMENSION.getValue().height / 5F)
+                        ));
 
                 case NECROPICK_VERTICES -> new CopyOnWriteArrayList<>(
                         List.of(new Point2D.Float(OMENOCT_DIMENSION.getValue().width / 2F, 0),
@@ -78,6 +103,8 @@ public enum EntityConstants {
                                 new Point2D.Float(0, OMENOCT_DIMENSION.getValue().height / 5F),
                                 new Point2D.Float(OMENOCT_DIMENSION.getValue().width, OMENOCT_DIMENSION.getValue().height / 5F)
                         ));
+
+                case BULLET_VERTICES, EPSILON_VERTICES, COLLECTIBLE_VERTICES -> new CopyOnWriteArrayList<>();
             };
         }
     }

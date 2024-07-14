@@ -70,7 +70,7 @@ public class WaveManager {
 
     public void lockEnemies() {
         for (GeoShapeModel model : waveEntities) {
-            if (model instanceof SquarantineModel || model instanceof TrigorathModel) {
+            if (model instanceof SquarantineModel || model instanceof TrigorathModel || model instanceof ArchmireModel) {
                 model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
             } else if (model instanceof OmenoctModel) {
                 int offset = random.nextInt(50, 250);
@@ -89,13 +89,14 @@ public class WaveManager {
                     multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
                             random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
             GeoShapeModel model;
-            if (wave == 0) model = new SquarantineModel(location, getMainMotionPanelId());
+            if (wave == 0) model = new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
             else {
                 model = switch (random.nextInt(0, 4)) {
                     case 0 -> new SquarantineModel(location, getMainMotionPanelId());
                     case 1 -> new TrigorathModel(location, getMainMotionPanelId());
-                    case 2, 3 -> new OmenoctModel(location, getMainMotionPanelId());
-                    case 4 -> new NecropickModel(location, getMainMotionPanelId());
+                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
+                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
+                    case 4 -> new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
                     default -> null;
                 };
             }

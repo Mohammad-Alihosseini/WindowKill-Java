@@ -7,7 +7,7 @@ import static controller.constants.ViewConstants.*;
 
 public enum DimensionConstants {
     SCREEN_SIZE, EPSILON_DIMENSION, TRIGORATH_DIMENSION, SQUARANTINE_DIMENSION, OMENOCT_DIMENSION, NECROPICK_DIMENSION,
-    BULLET_DIMENSION, LOGIN_PAGE_DIMENSION,
+    BULLET_DIMENSION, LOGIN_PAGE_DIMENSION, ARCHMIRE_DIMENSION, MINIARCHMIRE_DIMENSION,
     MAIN_MENU_DIMENSION, SETTINGS_MENU_DIMENSION, SKILL_TREE_DIMENSION, PAUSE_MENU_DIMENSION, FPS_COUNTER_DIMENSION;
 
     public Dimension getValue() {
@@ -22,6 +22,10 @@ public enum DimensionConstants {
             case OMENOCT_DIMENSION -> new Dimension((int) OMENOCT_FACTOR.getValue(), (int) OMENOCT_FACTOR.getValue());
             case NECROPICK_DIMENSION ->
                     new Dimension((int) NECROPICK_FACTOR.getValue(), (int) NECROPICK_FACTOR.getValue());
+            case ARCHMIRE_DIMENSION ->
+                    new Dimension((int) ARCHMIRE_FACTOR.getValue(), (int) ARCHMIRE_FACTOR.getValue());
+            case MINIARCHMIRE_DIMENSION ->
+                    new Dimension((int) ARCHMIRE_FACTOR.getValue() / 2, (int) ARCHMIRE_FACTOR.getValue() / 2);
             case BULLET_DIMENSION -> new Dimension((int) BULLET_FACTOR.getValue(), (int) BULLET_FACTOR.getValue());
             case LOGIN_PAGE_DIMENSION -> new Dimension(750, 400);
             case MAIN_MENU_DIMENSION -> new Dimension(700, 800);
@@ -38,7 +42,7 @@ public enum DimensionConstants {
         public Point2D getValue() {
             return switch (this) {
 
-                case DEFORM_DIMENSION -> new Point2D.Float(400, 400);
+                case DEFORM_DIMENSION -> new Point2D.Float(500, 500);
                 case MAIN_MOTIONPANEL_DIMENSION -> new Point2D.Float(800, 800);
             };
         }

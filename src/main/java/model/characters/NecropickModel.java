@@ -1,5 +1,6 @@
 package model.characters;
 
+import model.MotionPanelModel;
 import model.collision.Collidable;
 import model.entities.AttackTypes;
 import model.movement.Direction;
@@ -102,7 +103,7 @@ public class NecropickModel extends GeoShapeModel implements LongRanged, Enemy {
         if (isPainted) {
             return collidable instanceof GeoShapeModel;
         } else {
-            return !(collidable instanceof GeoShapeModel);
+            return !(collidable instanceof GeoShapeModel) && !(collidable instanceof MotionPanelModel);
         }
     }
 

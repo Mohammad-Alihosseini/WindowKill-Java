@@ -66,6 +66,11 @@ public abstract class UserInterfaceController {
         view.setViewId(modelId);
     }
 
+    public static void createArchmire(String modelId, Point anchor, String motionPanelId, boolean isMini) {
+        ArchmireView view = new ArchmireView(anchor, findMotionPanelView(motionPanelId), isMini);
+        view.setViewId(modelId);
+    }
+
     public static void createCollectible(String modelId, String ancestorId, int value, Point anchor, String motionPanelId) {
         CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), findMotionPanelView(motionPanelId));
         collectibleView.setViewId(modelId);

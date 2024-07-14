@@ -1,9 +1,6 @@
 package controller.constants;
 
-import view.characters.GeoShapeView;
-import view.characters.OmenoctView;
-import view.characters.SquarantineView;
-import view.characters.TrigorathView;
+import view.characters.*;
 
 import javax.sound.sampled.Clip;
 import java.awt.*;
@@ -53,6 +50,10 @@ public class DefaultMethods {
             color = averageTone(getRawImage(OMENOCT_IMAGEPATH.getValue()));
         else if (geoShapeView.getClass().equals(TrigorathView.class))
             color = averageTone(getRawImage(TRIGORATH_IMAGEPATH.getValue()));
+        else if (geoShapeView.getClass().equals(NecropickView.class))
+            color = averageTone(getRawImage(NECROPICK_IMAGEPATH.getValue()));
+        else if (geoShapeView.getClass().equals(ArchmireView.class))
+            color = averageTone(getRawImage(ARCHMIRE_IMAGEPATH.getValue()));
         else color = new Color(0, 0, 0, 0);
         return color;
     }

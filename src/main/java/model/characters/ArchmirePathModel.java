@@ -3,25 +3,21 @@ package model.characters;
 import model.MotionPanelModel;
 import model.collision.Collidable;
 import model.entities.AttackTypes;
-import model.projectiles.BulletModel;
-import view.containers.MotionPanelView;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.createArchmire;
-import static controller.constants.EntityConstants.ARCHMIRE_HEALTH;
-import static controller.constants.EntityConstants.ARCHMIRE_MELEE;
+import static controller.constants.EntityConstants.*;
 import static controller.constants.EntityConstants.EntityVertices.ARCHMIRE_VERTICES;
 import static controller.constants.EntityConstants.EntityVertices.MINIARCHMIRE_VERTICES;
 import static model.Utils.roundPoint;
 
-public class ArchmireModel extends GeoShapeModel implements Enemy {
-    private final Timer timer;
+public class ArchmirePathModel extends GeoShapeModel implements Enemy {
 
-    public ArchmireModel(Point anchor, String motionPanelId, Boolean isMini) {
+    public ArchmirePathModel(Point anchor, String motionPanelId, Boolean isMini) {
         super(new Point(0, 0), getVertices(isMini), ARCHMIRE_HEALTH.getValue());
         this.setCircular(false);
         setMotionPanelId(motionPanelId);
@@ -30,30 +26,25 @@ public class ArchmireModel extends GeoShapeModel implements Enemy {
         createArchmire(getModelId(), roundPoint(getAnchorSave()), motionPanelId, isMini);
         moveShapeModel(anchor);
         getMovement().setAnchor(anchor);
+        setNumberOfCollectibles(0);
+        setCollectibleValue(0);
+        setVulnerable(false);
 
-        if (isMini) {
-            setNumberOfCollectibles(2);
-            setCollectibleValue(3);
-        } else {
-            setNumberOfCollectibles(5);
-            setCollectibleValue(6);
-        }
+        getMovement().setAngularSpeed(0);
+        getMovement().setSpeedSave(0);
+        getMovement().setSpeed(0);
+        getMovement().setDeceleration(0);
+        getMovement().setDecay(0);
 
-        timer = new Timer(1000, e -> {
-            if (MotionPanelView.getMainMotionPanelView() != null) {
-                Point newAnchor = new Point(
-                        (int) getMovement().getLastAnchor().getX(),
-                        (int) getMovement().getLastAnchor().getY()
-                );
-                new ArchmirePathModel(newAnchor, motionPanelId, isMini);
-            }
-        });
-
+        Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(ARCHMIRE_PATH_LIFE_TIME.getValue()), e -> eliminate());
+        timer.setCoalesce(true);
+        timer.setRepeats(false);
         timer.start();
+
     }
 
-    private static List<Point2D> getVertices(boolean isMini) {
-        List<Point2D> vertices;
+    private static java.util.List<Point2D> getVertices(boolean isMini) {
+        java.util.List<Point2D> vertices;
         if (isMini) vertices = MINIARCHMIRE_VERTICES.getValue();
         else vertices = ARCHMIRE_VERTICES.getValue();
         return vertices;
@@ -61,12 +52,6 @@ public class ArchmireModel extends GeoShapeModel implements Enemy {
 
     @Override
     public boolean collide(Collidable collidable) {
-        if (collidable instanceof BulletModel) return true;
         return !(collidable instanceof GeoShapeModel) && !(collidable instanceof MotionPanelModel);
-    }
-
-    public void eliminate() {
-        timer.stop();
-        super.eliminate();
     }
 }
