@@ -2,6 +2,7 @@ package model.collision;
 
 import model.MotionPanelModel;
 import model.Profile;
+import model.characters.ArchmireModel;
 import model.characters.CollectibleModel;
 import model.characters.EpsilonModel;
 import model.characters.GeoShapeModel;
@@ -99,12 +100,33 @@ public final class Collision implements Runnable {
         return new MutablePair<>(melee1to2, melee2to1);
     }
 
+    public static Pair<Boolean, Boolean> checkDrown(MovementState.CollisionState state) {
+        boolean drown1in2 = state.stateOf1.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
+                (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
+        boolean drown2in1 = state.stateOf2.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
+                (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
+        return new MutablePair<>(drown1in2, drown2in1);
+    }
+
     public static void resolveCollectiblePickup(MovementState.CollisionState state) {
         if (state.stateOf1.collidable instanceof EpsilonModel && state.stateOf2.collidable instanceof CollectibleModel) {
             Profile.getCurrent().setCurrentGameXP(Profile.getCurrent().getCurrentGameXP() + ((CollectibleModel) state.stateOf2.collidable).getValue());
         }
         if (state.stateOf2.collidable instanceof EpsilonModel && state.stateOf1.collidable instanceof CollectibleModel) {
             Profile.getCurrent().setCurrentGameXP(Profile.getCurrent().getCurrentGameXP() + ((CollectibleModel) state.stateOf1.collidable).getValue());
+        }
+    }
+
+    public static void resolveDrownDamage(MovementState.CollisionState state) {
+        if (state.stateOf1.collidable instanceof ArchmireModel entity1 && state.stateOf2.collidable instanceof Entity entity2 && state.collisionPoint != null) {
+            Pair<Boolean, Boolean> drownPair = checkDrown(state);
+            if (drownPair.getLeft() && drownPair.getRight()) return;
+            if (entity1.isVulnerable() && (state.stateOf2.collidable instanceof BulletModel || state.stateOf1.collidable instanceof CollectibleModel || drownPair.getRight())) {
+                entity2.damage(entity1, AttackTypes.MELEE);
+            }
+            if (entity2.isVulnerable() && (state.stateOf1.collidable instanceof BulletModel || state.stateOf2.collidable instanceof CollectibleModel || drownPair.getLeft())) {
+                entity1.damage(entity2, AttackTypes.MELEE);
+            }
         }
     }
 

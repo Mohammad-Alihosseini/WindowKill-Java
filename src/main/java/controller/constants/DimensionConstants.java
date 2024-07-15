@@ -7,7 +7,7 @@ import static controller.constants.ViewConstants.*;
 
 public enum DimensionConstants {
     SCREEN_SIZE, EPSILON_DIMENSION, TRIGORATH_DIMENSION, SQUARANTINE_DIMENSION, OMENOCT_DIMENSION, NECROPICK_DIMENSION,
-    BULLET_DIMENSION, LOGIN_PAGE_DIMENSION, ARCHMIRE_DIMENSION, MINIARCHMIRE_DIMENSION,
+    BULLET_DIMENSION, LOGIN_PAGE_DIMENSION, ARCHMIRE_DIMENSION, MINIARCHMIRE_DIMENSION, WYRM_DIMENSION,
     MAIN_MENU_DIMENSION, SETTINGS_MENU_DIMENSION, SKILL_TREE_DIMENSION, PAUSE_MENU_DIMENSION, FPS_COUNTER_DIMENSION;
 
     public Dimension getValue() {
@@ -28,6 +28,7 @@ public enum DimensionConstants {
                     new Dimension((int) ARCHMIRE_FACTOR.getValue() / 2, (int) ARCHMIRE_FACTOR.getValue() / 2);
             case BULLET_DIMENSION -> new Dimension((int) BULLET_FACTOR.getValue(), (int) BULLET_FACTOR.getValue());
             case LOGIN_PAGE_DIMENSION -> new Dimension(750, 400);
+            case WYRM_DIMENSION -> new Dimension((int) WYRM_FACTOR.getValue(), (int) WYRM_FACTOR.getValue());
             case MAIN_MENU_DIMENSION -> new Dimension(700, 800);
             case SETTINGS_MENU_DIMENSION -> new Dimension(900, 400);
             case SKILL_TREE_DIMENSION -> new Dimension(900, 950);

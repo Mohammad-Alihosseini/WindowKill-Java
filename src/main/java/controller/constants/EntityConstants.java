@@ -12,13 +12,14 @@ public enum EntityConstants {
     EPSILON_HEALTH, SHOTS_PER_SECOND, SKILL_COOLDOWN_IN_MINUTES, COLLECTIBLE_LIFE_TIME, EPSILON_RAPID_SHOOTING_DELAY,
     EPSILON_SHOOTING_RAPIDITY, ENEMY_SHOUTING_RAPIDITY,
     TRIGORATH_MELEE_DAMAGE, SQUARANTINE_MELEE_DAMAGE, TRIGORATH_HEALTH, SQUARANTINE_HEALTH,
-    WYRM_HEALTH, BARRICADOS_HEALTH, NECROPICK_HEALTH, ARCHMIRE_HEALTH, OMENOCT_HEALTH,
+    BARRICADOS_HEALTH,
     BULLET_HEALTH, COLLECTIBLE_HEALTH,
-    ARCHMIRE_MELEE,
+    ARCHMIRE_HEALTH, ARCHMIRE_MELEE,
     //    ARCHMIRE_AOE, ARCHMIRE_DROWN,
     ARCHMIRE_PATH_LIFE_TIME, ARCHMIRE_PATH_MELEE,
-    OMENOCT_MELEE, OMENOCT_RANGED,
-    NECROPICK_RANGED, NECROPICK_MELEE, NECROPICK_DISTANCE_FROM_EPSILON;
+    OMENOCT_HEALTH, OMENOCT_MELEE, OMENOCT_RANGED,
+    NECROPICK_RANGED, NECROPICK_MELEE, NECROPICK_DISTANCE_FROM_EPSILON, NECROPICK_HEALTH,
+    WYRM_HEALTH, WYRM_RANGED,;
 
     public int getValue() {
         return switch (this) {
@@ -49,12 +50,13 @@ public enum EntityConstants {
             case NECROPICK_RANGED -> 0;
             case NECROPICK_MELEE -> 0;
             case NECROPICK_DISTANCE_FROM_EPSILON -> (int) Profile.getCurrent().getSizeScale() * 120;
+            case WYRM_RANGED -> 8;
         };
     }
 
     public enum EntityVertices {
         TRIGORATH_VERTICES, SQUARANTINE_VERTICES, OMENOCT_VERTICES, BULLET_VERTICES, EPSILON_VERTICES,
-        ARCHMIRE_VERTICES, MINIARCHMIRE_VERTICES,
+        ARCHMIRE_VERTICES, MINIARCHMIRE_VERTICES, WYRM_VERTICES,
         COLLECTIBLE_VERTICES, NECROPICK_VERTICES;
 
         public List<Point2D> getValue() {
@@ -104,6 +106,12 @@ public enum EntityConstants {
                                 new Point2D.Float(OMENOCT_DIMENSION.getValue().width, OMENOCT_DIMENSION.getValue().height / 5F)
                         ));
 
+                case WYRM_VERTICES -> new CopyOnWriteArrayList<>(
+                        List.of(new Point2D.Float(WYRM_DIMENSION.getValue().width / 3F, 0),
+                                new Point2D.Float(2*WYRM_DIMENSION.getValue().width / 3F, WYRM_DIMENSION.getValue().height),
+                                new Point2D.Float(0, 4*WYRM_DIMENSION.getValue().height / 5F),
+                                new Point2D.Float(WYRM_DIMENSION.getValue().width, WYRM_DIMENSION.getValue().height / 5F)
+                        ));
                 case BULLET_VERTICES, EPSILON_VERTICES, COLLECTIBLE_VERTICES -> new CopyOnWriteArrayList<>();
             };
         }

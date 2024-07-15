@@ -71,6 +71,11 @@ public abstract class UserInterfaceController {
         view.setViewId(modelId);
     }
 
+    public static void createWyrm(String modelId, Point anchor, String motionPanelId) {
+        WyrmView view = new WyrmView(anchor, findMotionPanelView(motionPanelId));
+        view.setViewId(modelId);
+    }
+
     public static void createCollectible(String modelId, String ancestorId, int value, Point anchor, String motionPanelId) {
         CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), findMotionPanelView(motionPanelId));
         collectibleView.setViewId(modelId);
