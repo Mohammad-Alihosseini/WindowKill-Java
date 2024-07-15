@@ -1,6 +1,7 @@
 package model;
 
 import model.characters.*;
+import model.frames.MotionPanelModel;
 import model.movement.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Coordinate;

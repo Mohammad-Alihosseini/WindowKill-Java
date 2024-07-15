@@ -1,6 +1,6 @@
 package controller;
 
-import model.MotionPanelModel;
+import model.frames.MotionPanelModel;
 import model.Profile;
 import model.WaveManager;
 import model.characters.EpsilonModel;
@@ -18,8 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static controller.UserInterfaceController.*;
 import static controller.constants.ViewConstants.BASE_PAINT_OPACITY;
-import static model.MotionPanelModel.allMotionPanelModelsList;
-import static model.MotionPanelModel.getMainMotionPanelModel;
+import static model.frames.MotionPanelModel.allMotionPanelModelsList;
+import static model.frames.MotionPanelModel.getMainMotionPanelModel;
 import static model.characters.GeoShapeModel.allShapeModelsList;
 import static view.containers.GlassFrame.getGlassFrame;
 import static view.containers.MotionPanelView.allMotionPanelViewsList;

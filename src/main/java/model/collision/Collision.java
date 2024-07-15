@@ -1,6 +1,6 @@
 package model.collision;
 
-import model.MotionPanelModel;
+import model.frames.MotionPanelModel;
 import model.Profile;
 import model.characters.ArchmireModel;
 import model.characters.CollectibleModel;
@@ -19,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static controller.constants.ImpactConstants.IMPACT_RADIUS;
 import static controller.constants.ImpactConstants.IMPACT_SCALE;
-import static model.MotionPanelModel.getMainMotionPanelModel;
+import static model.frames.MotionPanelModel.getMainMotionPanelModel;
 import static model.Utils.*;
 import static model.characters.GeoShapeModel.allShapeModelsList;
 

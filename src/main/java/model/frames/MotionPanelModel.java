@@ -1,4 +1,4 @@
-package model;
+package model.frames;
 
 import controller.AtomicFloat;
 import controller.TypedActionListener;

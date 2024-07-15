@@ -1,6 +1,6 @@
 package model.characters;
 
-import model.MotionPanelModel;
+import model.frames.MotionPanelModel;
 import model.entities.AttackTypes;
 
 import java.awt.*;
@@ -9,7 +9,6 @@ import java.awt.geom.Point2D;
 import static controller.UserInterfaceController.createWyrm;
 import static controller.constants.DimensionConstants.WYRM_DIMENSION;
 import static controller.constants.EntityConstants.*;
-import static controller.constants.EntityConstants.EntityVertices.SQUARANTINE_VERTICES;
 import static controller.constants.EntityConstants.EntityVertices.WYRM_VERTICES;
 import static model.Utils.roundPoint;
 

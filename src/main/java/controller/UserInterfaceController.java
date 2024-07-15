@@ -1,7 +1,7 @@
 package controller;
 
 import model.JsonOperator;
-import model.MotionPanelModel;
+import model.frames.MotionPanelModel;
 import model.Profile;
 import model.characters.EpsilonModel;
 import model.characters.GeoShapeModel;
@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static controller.AudioHandler.clips;
 import static controller.constants.FilePaths.*;
-import static model.MotionPanelModel.*;
+import static model.frames.MotionPanelModel.*;
 import static model.Utils.*;
 import static model.characters.GeoShapeModel.allShapeModelsList;
 import static view.characters.GeoShapeView.allShapeViewsList;

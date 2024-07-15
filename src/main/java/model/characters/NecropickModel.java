@@ -1,6 +1,6 @@
 package model.characters;
 
-import model.MotionPanelModel;
+import model.frames.MotionPanelModel;
 import model.collision.Collidable;
 import model.entities.AttackTypes;
 import model.movement.Direction;
