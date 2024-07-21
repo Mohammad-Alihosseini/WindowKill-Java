@@ -1,9 +1,9 @@
 package model.projectiles;
 
-import model.frames.MotionPanelModel;
 import model.characters.Enemy;
 import model.characters.GeoShapeModel;
 import model.collision.Collidable;
+import model.frames.MotionPanelModel;
 import model.movement.Direction;
 
 import javax.swing.*;

@@ -1,8 +1,8 @@
 package model.characters;
 
-import model.frames.MotionPanelModel;
 import model.collision.Collidable;
 import model.entities.AttackTypes;
+import model.frames.MotionPanelModel;
 import model.movement.Direction;
 import model.projectiles.LongRanged;
 import model.projectiles.ShooterEntity;

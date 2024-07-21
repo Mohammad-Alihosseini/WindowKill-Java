@@ -19,7 +19,8 @@ public enum EntityConstants {
     ARCHMIRE_PATH_LIFE_TIME, ARCHMIRE_PATH_MELEE,
     OMENOCT_HEALTH, OMENOCT_MELEE, OMENOCT_RANGED,
     NECROPICK_RANGED, NECROPICK_MELEE, NECROPICK_DISTANCE_FROM_EPSILON, NECROPICK_HEALTH,
-    WYRM_HEALTH, WYRM_RANGED,;
+    WYRM_HEALTH, WYRM_RANGED,
+    ;
 
     public int getValue() {
         return switch (this) {
@@ -108,8 +109,8 @@ public enum EntityConstants {
 
                 case WYRM_VERTICES -> new CopyOnWriteArrayList<>(
                         List.of(new Point2D.Float(WYRM_DIMENSION.getValue().width / 3F, 0),
-                                new Point2D.Float(2*WYRM_DIMENSION.getValue().width / 3F, WYRM_DIMENSION.getValue().height),
-                                new Point2D.Float(0, 4*WYRM_DIMENSION.getValue().height / 5F),
+                                new Point2D.Float(2 * WYRM_DIMENSION.getValue().width / 3F, WYRM_DIMENSION.getValue().height),
+                                new Point2D.Float(0, 4 * WYRM_DIMENSION.getValue().height / 5F),
                                 new Point2D.Float(WYRM_DIMENSION.getValue().width, WYRM_DIMENSION.getValue().height / 5F)
                         ));
                 case BULLET_VERTICES, EPSILON_VERTICES, COLLECTIBLE_VERTICES -> new CopyOnWriteArrayList<>();

@@ -54,6 +54,8 @@ public class DefaultMethods {
             color = averageTone(getRawImage(NECROPICK_IMAGEPATH.getValue()));
         else if (geoShapeView.getClass().equals(ArchmireView.class))
             color = averageTone(getRawImage(ARCHMIRE_IMAGEPATH.getValue()));
+        else if (geoShapeView.getClass().equals(WyrmView.class))
+            color = averageTone(getRawImage(WYRM_IMAGEPATH.getValue()));
         else color = new Color(0, 0, 0, 0);
         return color;
     }

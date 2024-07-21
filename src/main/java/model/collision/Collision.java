@@ -1,6 +1,5 @@
 package model.collision;
 
-import model.frames.MotionPanelModel;
 import model.Profile;
 import model.characters.ArchmireModel;
 import model.characters.CollectibleModel;
@@ -8,6 +7,7 @@ import model.characters.EpsilonModel;
 import model.characters.GeoShapeModel;
 import model.entities.AttackTypes;
 import model.entities.Entity;
+import model.frames.MotionPanelModel;
 import model.movement.Direction;
 import model.projectiles.BulletModel;
 import org.apache.commons.lang3.tuple.MutablePair;
@@ -19,9 +19,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static controller.constants.ImpactConstants.IMPACT_RADIUS;
 import static controller.constants.ImpactConstants.IMPACT_SCALE;
-import static model.frames.MotionPanelModel.getMainMotionPanelModel;
 import static model.Utils.*;
 import static model.characters.GeoShapeModel.allShapeModelsList;
+import static model.frames.MotionPanelModel.getMainMotionPanelModel;
 
 public final class Collision implements Runnable {
     private static Collision INSTANCE = null;
