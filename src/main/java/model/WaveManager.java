@@ -71,7 +71,7 @@ public class WaveManager {
 
     public void lockEnemies() {
         for (GeoShapeModel model : waveEntities) {
-            if (model instanceof SquarantineModel || model instanceof TrigorathModel || model instanceof ArchmireModel || model instanceof WyrmModel) {
+            if (model instanceof SquarantineModel || model instanceof TrigorathModel || model instanceof ArchmireModel) {
                 model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
             } else if (model instanceof OmenoctModel) {
                 int offset = random.nextInt(50, 250);
@@ -80,6 +80,9 @@ public class WaveManager {
             } else if (model instanceof NecropickModel) {
                 Timer timer = getNecropickTimer(model);
                 timer.start();
+            } else if (model instanceof WyrmModel) {
+                model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
+                ((WyrmModel) model).getIsometricMotionPanelModel().getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
             }
         }
     }
@@ -90,7 +93,7 @@ public class WaveManager {
                     multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
                             random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
             GeoShapeModel model;
-            if (wave == 0) model = new WyrmModel(location);
+            if (wave == 0) model = new WyrmModel(new Point(100, 100));
             else {
                 model = switch (random.nextInt(0, 4)) {
                     case 0 -> new SquarantineModel(location, getMainMotionPanelId());

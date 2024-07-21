@@ -18,7 +18,7 @@ public class Profile {
     public static final int PAUSE_KEYCODE = KeyEvent.VK_ESCAPE;
     private static Profile current = new Profile("");
     private String profileId;
-    private List<Integer> waveEnemyCount = new CopyOnWriteArrayList<>(List.of(3, 6, 10, 14, 16));
+    private List<Integer> waveEnemyCount = new CopyOnWriteArrayList<>(List.of(1, 6, 10, 14, 16));
     private int ups = 800;
     private int fps = 80;
     private int epsilonMeleeDamage = 10;

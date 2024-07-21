@@ -38,7 +38,7 @@ public class MotionPanelModel implements Collidable, Movable {
     private Point2D lastLocation;
     private Point2D lastDimension;
 
-    public MotionPanelModel(Point2D location, Point2D dimension) {
+    public MotionPanelModel(Point2D location, Point2D dimension, Point2D deformDim) {
         this.modelId = UUID.randomUUID().toString();
         allMotionPanelModelsList.add(this);
         setPosition(location, dimension);
@@ -48,14 +48,18 @@ public class MotionPanelModel implements Collidable, Movable {
 
         new Timer((int) SHRINK_DELAY.getValue(), e -> {
             if (!hasShrinkType(TypedActionListener.Side.CENTER)) {
-                deform(DEFORM_DIMENSION.getValue(), TypedActionListener.Side.CENTER, SHRINK_SCALE.getValue());
+                deform(getDeformDimension(deformDim), TypedActionListener.Side.CENTER, SHRINK_SCALE.getValue());
             }
         }).start();
     }
 
     public MotionPanelModel(Point2D dimension) {
         this(new Point2D.Float((float) ((SCREEN_SIZE.getValue().width - dimension.getX()) / 2),
-                (float) ((SCREEN_SIZE.getValue().height - dimension.getY()) / 2)), dimension);
+                (float) ((SCREEN_SIZE.getValue().height - dimension.getY()) / 2)), dimension, null);
+    }
+
+    public static Point2D getDeformDimension(Point2D deformDim) {
+        return deformDim == null ? DEFORM_DIMENSION.getValue() : deformDim;
     }
 
     /**
@@ -183,8 +187,8 @@ public class MotionPanelModel implements Collidable, Movable {
     public void extend(Point point) {
         TypedActionListener.Side[] collisionSides = detectCollisionSides(point);
         if (collisionSides[0] != null)
-            deform(new Point2D.Float((float) (getDimension().getX() + EXTENSION_LENGTH.getValue()),
-                    (float) getDimension().getY()), collisionSides[0], EXTEND_SPEED_SCALE.getValue());
+            deform(new Point2D.Float((float) (getDimension().getX() + EXTENSION_LENGTH.getValue()), (float) getDimension().getY()),
+                    collisionSides[0], EXTEND_SPEED_SCALE.getValue());
         if (collisionSides[1] != null)
             deform(new Point2D.Float((float) getDimension().getX(), (float) (getDimension().getY() + EXTENSION_LENGTH.getValue())),
                     collisionSides[1], EXTEND_SPEED_SCALE.getValue());

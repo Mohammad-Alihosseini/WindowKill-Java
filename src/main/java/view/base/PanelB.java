@@ -86,6 +86,10 @@ public class PanelB extends JPanel {
         this.currentImage = bufferedImageClone(image);
     }
 
+    public BufferedImage getImageSave() {
+        return imageSave;
+    }
+
     @Override
     public void setSize(int width, int height) {
         if (imageSave != null && BACKGROUND_RESIZE)

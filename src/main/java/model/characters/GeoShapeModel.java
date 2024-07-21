@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static controller.UserInterfaceController.moveGeoShape;
-import static controller.UserInterfaceController.rotateGeoShape;
 import static controller.constants.DefaultMethods.cosTable;
 import static controller.constants.DefaultMethods.sinTable;
 import static model.Utils.*;
@@ -42,6 +40,7 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
         allShapeModelsList.add(this);
         Collidable.collidables.add(this);
         Movable.movables.add(this);
+        Translatable.translatable.add(this);
     }
 
     public void placeVertices(int n) {
@@ -60,30 +59,6 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
 
     public void addVertex() {
         if (isCircular()) placeVertices(verticesSave.size() + 1);
-    }
-
-    public void setVerticesSave(List<Point2D> verticesSave) {
-        this.vertices.clear();
-        this.vertices.addAll(deepCloneList(verticesSave));
-        this.verticesSave.clear();
-        this.verticesSave.addAll(deepCloneList(verticesSave));
-        createGeometry();
-    }
-
-    @Override
-    public void moveShapeModel(Point2D newAnchor) {
-        for (int i = 0; i < verticesSave.size(); i++)
-            getVertices().set(i, addUpPoints(verticesSave.get(i), relativeLocation(newAnchor, getAnchorSave())));
-        moveGeoShape(getModelId(), movement.getAnchor());
-    }
-
-    @Override
-    public void rotateShapeModel(float currentRotation) {
-        setTotalRotation(getTotalRotation() - currentRotation);
-        for (int i = 0; i < getVertices().size(); i++)
-            getVertices().set(i, addUpPoints(relativeLocation(getMovement().getAnchor(), getAnchorSave()),
-                    rotateAbout(verticesSave.get(i), getAnchorSave(), getTotalRotation())));
-        rotateGeoShape(getModelId(), currentRotation);
     }
 
     @Override
@@ -192,11 +167,33 @@ public class GeoShapeModel extends Entity implements Collidable, Translatable, M
         return vertices;
     }
 
+    @Override
+    public List<Point2D> getVerticesSave() {
+        return verticesSave;
+    }
+
+    public void setVerticesSave(List<Point2D> verticesSave) {
+        this.vertices.clear();
+        this.vertices.addAll(deepCloneList(verticesSave));
+        this.verticesSave.clear();
+        this.verticesSave.addAll(deepCloneList(verticesSave));
+        createGeometry();
+    }
+
     public float getTotalRotation() {
         return totalRotation;
     }
 
     public void setTotalRotation(float totalRotation) {
         this.totalRotation = totalRotation;
+    }
+
+    public boolean crossesUnmovable(Point2D anchorLocation) {
+        for (Collidable collidable : collidables) {
+            boolean shouldCollide = this.collide(collidable) && collidable.collide(this);
+            if (!(collidable instanceof Translatable) && shouldCollide && willCross(collidable, anchorLocation))
+                return true;
+        }
+        return false;
     }
 }
