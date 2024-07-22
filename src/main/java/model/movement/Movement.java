@@ -1,6 +1,7 @@
 package model.movement;
 
 import controller.TypedActionListener;
+import model.characters.GeoShapeModel;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import static controller.UserInterfaceController.findTranslatableModel;
+import static controller.UserInterfaceController.findModel;
 import static controller.constants.ImpactConstants.*;
 import static controller.constants.MovementConstants.*;
 import static model.Utils.*;
@@ -52,7 +53,7 @@ public class Movement {
     }
 
     public void move() {
-        Translatable model = findTranslatableModel(getModelId());
+        GeoShapeModel model = findModel(getModelId());
         if (model == null) return;
         model.moveShapeModel(getAnchor());
     }
@@ -60,7 +61,7 @@ public class Movement {
     public void updateAnchor(float speed, Direction direction) {
         if (getTargetModelId() != null) lockOnTarget(getTargetModelId());
         else if (getTarget() != null) lockOnTarget(getTarget());
-        Translatable model = findTranslatableModel(getModelId());
+        GeoShapeModel model = findModel(getModelId());
         if (model == null) return;
         Point2D destination = addUpPoints(getAnchor(), multiplyPoint(direction.getDirectionVector(), speed));
         if (!model.crossesUnmovable(destination)) setAnchor(destination);
@@ -75,7 +76,7 @@ public class Movement {
     }
 
     public void rotate() {
-        Translatable model = findTranslatableModel(getModelId());
+        GeoShapeModel model = findModel(getModelId());
         if (model == null) return;
         model.rotateShapeModel(getAngularSpeed());
     }
@@ -142,7 +143,7 @@ public class Movement {
 
     public void lockOnTarget(String targetModelId) {
         this.setTargetModelId(targetModelId);
-        Translatable model = findTranslatableModel(targetModelId);
+        GeoShapeModel model = findModel(targetModelId);
         if (model != null) setTarget(model.getMovement().getAnchor());
         lockOnTarget(getTarget());
     }

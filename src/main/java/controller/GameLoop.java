@@ -3,11 +3,10 @@ package controller;
 import model.Profile;
 import model.WaveManager;
 import model.characters.EpsilonModel;
+import model.characters.GeoShapeModel;
 import model.collision.Collision;
 import model.frames.MotionPanelModel;
 import model.movement.Movable;
-import model.movement.Translatable;
-import view.base.TranslatableView;
 import view.characters.GeoShapeView;
 import view.containers.MotionPanelView;
 
@@ -19,10 +18,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static controller.UserInterfaceController.*;
 import static controller.constants.ViewConstants.BASE_PAINT_OPACITY;
+import static model.characters.GeoShapeModel.allShapeModelsList;
 import static model.frames.MotionPanelModel.allMotionPanelModelsList;
 import static model.frames.MotionPanelModel.getMainMotionPanelModel;
-import static model.movement.Translatable.translatable;
-import static view.base.TranslatableView.translatableViews;
 import static view.containers.GlassFrame.getGlassFrame;
 import static view.containers.MotionPanelView.allMotionPanelViewsList;
 import static view.containers.MotionPanelView.getMainMotionPanelView;
@@ -41,11 +39,6 @@ public final class GameLoop implements Runnable {
     private volatile String fpsUps = "";
 
     public static void updateView() {
-        for (TranslatableView translatableView : translatableViews) {
-            if (translatableView instanceof MotionPanelView) {
-
-            }
-        }
         for (MotionPanelView motionPanelView : allMotionPanelViewsList) {
             int[] properties = getMotionPanelProperties(motionPanelView.getViewId());
             motionPanelView.setBounds(properties[0], properties[1], properties[2], properties[3]);
@@ -64,8 +57,7 @@ public final class GameLoop implements Runnable {
                 actionListener.actionPerformed(new ActionEvent(new Object(), ActionEvent.ACTION_PERFORMED, null));
             }
         }
-
-        for (Translatable model : translatable) {
+        for (GeoShapeModel model : allShapeModelsList) {
             for (ActionListener actionListener : model.getMovement().getMoveListeners()) {
                 if (model.getMovement().getMoveListeners().contains(actionListener)) {
                     actionListener.actionPerformed(new ActionEvent(new Object(), ActionEvent.ACTION_PERFORMED, null));

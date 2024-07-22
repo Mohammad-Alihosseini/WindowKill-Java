@@ -9,13 +9,10 @@ import model.entities.Ability;
 import model.entities.Skill;
 import model.frames.MotionPanelModel;
 import model.movement.Movable;
-import model.movement.Translatable;
 import model.projectiles.ShooterEntity;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
-import view.base.TranslatableView;
 import view.characters.*;
-import view.containers.IsometricMotionPanelView;
 import view.containers.MotionPanelView;
 import view.menu.Message;
 
@@ -36,8 +33,6 @@ import static controller.constants.FilePaths.*;
 import static model.Utils.*;
 import static model.characters.GeoShapeModel.allShapeModelsList;
 import static model.frames.MotionPanelModel.*;
-import static model.movement.Translatable.translatable;
-import static view.base.TranslatableView.translatableViews;
 import static view.characters.GeoShapeView.allShapeViewsList;
 import static view.containers.MotionPanelView.allMotionPanelViewsList;
 import static view.containers.MotionPanelView.setMainMotionPanelView;
@@ -100,12 +95,6 @@ public abstract class UserInterfaceController {
 
     public static void createMotionPanel(String modelId, Point2D dimension, Point2D location) {
         MotionPanelView view = new MotionPanelView(pointToDimension(dimension), roundPoint(location));
-        view.setVisible(true);
-        view.setViewId(modelId);
-    }
-
-    public static void createIsometricMotionPanel(String modelId, Point2D dimension, Point2D location) {
-        IsometricMotionPanelView view = new IsometricMotionPanelView(pointToDimension(dimension), roundPoint(location));
         view.setVisible(true);
         view.setViewId(modelId);
     }
@@ -308,22 +297,8 @@ public abstract class UserInterfaceController {
         return null;
     }
 
-    public static synchronized TranslatableView findTranslatableView(String modelId) {
-        for (TranslatableView shapeView : translatableViews) {
-            if (modelId.equals(shapeView.getViewId())) return shapeView;
-        }
-        return null;
-    }
-
     public static synchronized GeoShapeModel findModel(String viewId) {
         for (GeoShapeModel shapeModel : allShapeModelsList) {
-            if (viewId.equals(shapeModel.getModelId())) return shapeModel;
-        }
-        return null;
-    }
-
-    public static synchronized Translatable findTranslatableModel(String viewId) {
-        for (Translatable shapeModel : translatable) {
             if (viewId.equals(shapeModel.getModelId())) return shapeModel;
         }
         return null;
@@ -343,13 +318,13 @@ public abstract class UserInterfaceController {
         return null;
     }
 
-    public static void moveShapeView(String modelId, Point2D newAnchorLocation) {
-        TranslatableView view = findTranslatableView(modelId);
+    public static void moveGeoShape(String modelId, Point2D newAnchorLocation) {
+        GeoShapeView view = findView(modelId);
         if (view != null) view.moveShapeView(roundPoint(newAnchorLocation));
     }
 
-    public static void rotateShapeView(String modelId, float angle) {
-        TranslatableView view = findTranslatableView(modelId);
+    public static void rotateGeoShape(String modelId, float angle) {
+        GeoShapeView view = findView(modelId);
         if (view != null) view.rotateShapeView(angle);
     }
 

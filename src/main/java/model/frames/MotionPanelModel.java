@@ -194,6 +194,19 @@ public class MotionPanelModel implements Collidable, Movable {
                     collisionSides[1], EXTEND_SPEED_SCALE.getValue());
     }
 
+    // todo better implementing this method
+    public void shrink(Point point) {
+        TypedActionListener.Side[] collisionSides = detectCollisionSides(point);
+        TypedActionListener.Side sideX = collisionSides[0] == TypedActionListener.Side.LEFT ? TypedActionListener.Side.RIGHT : TypedActionListener.Side.LEFT;
+        TypedActionListener.Side sideY = collisionSides[1] == TypedActionListener.Side.TOP ? TypedActionListener.Side.BOTTOM : TypedActionListener.Side.TOP;
+        if (collisionSides[0] != null)
+            deform(new Point2D.Float((float) (getDimension().getX() - EXTENSION_LENGTH.getValue()), (float) getDimension().getY()),
+                    sideX, EXTEND_SPEED_SCALE.getValue());
+        if (collisionSides[1] != null)
+            deform(new Point2D.Float((float) getDimension().getX(), (float) (getDimension().getY() - EXTENSION_LENGTH.getValue())),
+                    sideY, EXTEND_SPEED_SCALE.getValue());
+    }
+
     /**
      * Detects the sides from which the motion panel should be extended
      *

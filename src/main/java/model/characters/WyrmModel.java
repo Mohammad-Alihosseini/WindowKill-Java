@@ -7,8 +7,6 @@ import model.frames.MotionPanelModel;
 
 import java.awt.*;
 import java.awt.geom.Point2D;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import static controller.UserInterfaceController.createWyrm;
 import static controller.constants.DimensionConstants.WYRM_DIMENSION;
@@ -49,24 +47,11 @@ public class WyrmModel extends GeoShapeModel {
                 anchor.y - WYRM_DIMENSION.getValue().height / 2F
         );
 
-        List<Point2D> vertices = new CopyOnWriteArrayList<>(
-                List.of(
-                        new Point2D.Float(0, 0),
-                        new Point2D.Float(0, (float) motionPanelDim.getY()),
-                        new Point2D.Float((float) motionPanelDim.getX(), 0),
-                        new Point2D.Float((float) motionPanelDim.getX(), (float) motionPanelDim.getY())
-                )
-        );
-
-        isometricMotionPanelModel = new IsometricMotionPanelModel(location, motionPanelDim, vertices);
+        isometricMotionPanelModel = new IsometricMotionPanelModel(location, motionPanelDim);
     }
 
     @Override
     public boolean collide(Collidable collidable) {
         return (collidable instanceof MotionPanelModel);
-    }
-
-    public IsometricMotionPanelModel getIsometricMotionPanelModel() {
-        return isometricMotionPanelModel;
     }
 }
