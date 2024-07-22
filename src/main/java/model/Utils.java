@@ -12,6 +12,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static controller.constants.DimensionConstants.OMENOCT_DIMENSION;
+
 public class Utils {
     private Utils() {
     }
@@ -150,6 +152,34 @@ public class Utils {
      */
     public static Dimension pointToDimension(Point2D point2D) {
         return new Dimension((int) point2D.getX(), (int) point2D.getY());
+    }
+
+    /**
+     * @return side location for omenoct
+     */
+    public static Point2D getTargetSide(Coordinate[] coordinates, int offset, int side) {
+        Point2D target = null;
+        if (side == 0)
+            target = new Point2D.Double(
+                    coordinates[side].x + OMENOCT_DIMENSION.getValue().height + 10,
+                    coordinates[side].y + offset
+            );
+        else if (side == 1)
+            target = new Point2D.Double(
+                    coordinates[side].x - OMENOCT_DIMENSION.getValue().height + 10,
+                    coordinates[side].y + offset
+            );
+        else if (side == 2)
+            target = new Point2D.Double(
+                    coordinates[side].x - OMENOCT_DIMENSION.getValue().height + 10,
+                    coordinates[side].y - offset
+            );
+        else if (side == 3)
+            target = new Point2D.Double(
+                    coordinates[side].x + OMENOCT_DIMENSION.getValue().height + 10,
+                    coordinates[side].y - offset
+            );
+        return target;
     }
 
     public static Point2D.Float toPoint(Coordinate coordinate) {

@@ -17,7 +17,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.*;
-import static controller.constants.DimensionConstants.OMENOCT_DIMENSION;
 import static controller.constants.EntityConstants.NECROPICK_DISTANCE_FROM_EPSILON;
 import static controller.constants.WaveConstants.MAX_ENEMY_SPAWN_RADIUS;
 import static controller.constants.WaveConstants.MIN_ENEMY_SPAWN_RADIUS;
@@ -47,16 +46,13 @@ public class WaveManager {
     }
 
     @NotNull
-    private static Timer getOmenoctTimer(GeoShapeModel model, int offset) {
+    private static Timer getOmenoctTimer(GeoShapeModel model, int offset, int side) {
         //todo set target to motion panel
         Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), null);
         timer.addActionListener(e -> {
             if (MotionPanelView.getMainMotionPanelView() != null) {
                 Coordinate[] coordinates = MotionPanelModel.getMainMotionPanelModel().getGeometry().getCoordinates();
-                Point2D target = new Point2D.Double(
-                        coordinates[1].x - OMENOCT_DIMENSION.getValue().height + 10,
-                        coordinates[1].y + offset
-                );
+                Point2D target = getTargetSide(coordinates, offset, side);
                 model.getMovement().lockOnTarget(target);
             } else {
                 timer.stop();
@@ -71,18 +67,17 @@ public class WaveManager {
 
     public void lockEnemies() {
         for (GeoShapeModel model : waveEntities) {
-            if (model instanceof SquarantineModel || model instanceof TrigorathModel || model instanceof ArchmireModel) {
+            if (model instanceof SquarantineModel || model instanceof TrigorathModel ||
+                    model instanceof ArchmireModel || model instanceof WyrmModel) {
                 model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
             } else if (model instanceof OmenoctModel) {
                 int offset = random.nextInt(50, 250);
-                Timer timer = getOmenoctTimer(model, offset);
+                int side = random.nextInt(0, 4);
+                Timer timer = getOmenoctTimer(model, offset, side);
                 timer.start();
             } else if (model instanceof NecropickModel) {
                 Timer timer = getNecropickTimer(model);
                 timer.start();
-            } else if (model instanceof WyrmModel) {
-                model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
-                ((WyrmModel) model).getIsometricMotionPanelModel().getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
             }
         }
     }
@@ -93,7 +88,7 @@ public class WaveManager {
                     multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
                             random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
             GeoShapeModel model;
-            if (wave == 0) model = new WyrmModel(new Point(100, 100));
+            if (wave == 0) model = new OmenoctModel(location, getMainMotionPanelId());
             else {
                 model = switch (random.nextInt(0, 4)) {
                     case 0 -> new SquarantineModel(location, getMainMotionPanelId());
