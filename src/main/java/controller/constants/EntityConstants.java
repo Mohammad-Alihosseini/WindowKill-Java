@@ -9,18 +9,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import static controller.constants.DimensionConstants.*;
 
 public enum EntityConstants {
-    EPSILON_HEALTH, SHOTS_PER_SECOND, SKILL_COOLDOWN_IN_MINUTES, COLLECTIBLE_LIFE_TIME, EPSILON_RAPID_SHOOTING_DELAY,
-    EPSILON_SHOOTING_RAPIDITY, ENEMY_SHOUTING_RAPIDITY,
+    EPSILON_HEALTH, SHOTS_PER_SECOND, SKILL_COOLDOWN_IN_MINUTES, DROWN_COOL_DOWN_SECONDS, COLLECTIBLE_LIFE_TIME, EPSILON_RAPID_SHOOTING_DELAY,
+    EPSILON_SHOOTING_RAPIDITY, ENEMY_SHOUTING_RAPIDITY, ENEMY_BULLET_LIFE_TIME,
     TRIGORATH_MELEE_DAMAGE, SQUARANTINE_MELEE_DAMAGE, TRIGORATH_HEALTH, SQUARANTINE_HEALTH,
     BARRICADOS_HEALTH,
     BULLET_HEALTH, COLLECTIBLE_HEALTH,
     ARCHMIRE_HEALTH, ARCHMIRE_MELEE,
-    //    ARCHMIRE_AOE, ARCHMIRE_DROWN,
-    ARCHMIRE_PATH_LIFE_TIME, ARCHMIRE_PATH_MELEE,
+    ARCHMIRE_PATH_LIFE_TIME, ARCHMIRE_PATH_MELEE, ARCHMIRE_PATH_HEALTH,
     OMENOCT_HEALTH, OMENOCT_MELEE, OMENOCT_RANGED,
     NECROPICK_RANGED, NECROPICK_MELEE, NECROPICK_DISTANCE_FROM_EPSILON, NECROPICK_HEALTH,
-    WYRM_HEALTH, WYRM_RANGED,
-    ;
+    WYRM_HEALTH, WYRM_RANGED, WYRM_MELEE;
 
     public int getValue() {
         return switch (this) {
@@ -31,6 +29,7 @@ public enum EntityConstants {
             case SKILL_COOLDOWN_IN_MINUTES -> 5;
             case EPSILON_RAPID_SHOOTING_DELAY -> 50;
             case TRIGORATH_HEALTH -> 15;
+            case ENEMY_BULLET_LIFE_TIME -> 10;
             case TRIGORATH_MELEE_DAMAGE -> 10;
             case SQUARANTINE_HEALTH -> 10;
             case SQUARANTINE_MELEE_DAMAGE -> 6;
@@ -38,20 +37,21 @@ public enum EntityConstants {
             case BARRICADOS_HEALTH -> 999999999;
             case NECROPICK_HEALTH -> 10;
             case ARCHMIRE_HEALTH -> 30;
+            case ARCHMIRE_PATH_HEALTH -> 999999999;
             case OMENOCT_HEALTH -> 20;
             case BULLET_HEALTH, COLLECTIBLE_HEALTH -> 0;
+            case DROWN_COOL_DOWN_SECONDS -> 1;
             case COLLECTIBLE_LIFE_TIME -> 8;
             case ARCHMIRE_MELEE -> 10;
-//            case ARCHMIRE_AOE -> 2;
-//            case ARCHMIRE_DROWN -> 10;
             case ARCHMIRE_PATH_LIFE_TIME -> 5;
             case ARCHMIRE_PATH_MELEE -> 2;
             case OMENOCT_MELEE -> 8;
             case OMENOCT_RANGED -> 4;
-            case NECROPICK_RANGED -> 0;
+            case NECROPICK_RANGED -> 5;
             case NECROPICK_MELEE -> 0;
             case NECROPICK_DISTANCE_FROM_EPSILON -> (int) Profile.getCurrent().getSizeScale() * 120;
             case WYRM_RANGED -> 8;
+            case WYRM_MELEE -> 0;
         };
     }
 

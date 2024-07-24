@@ -18,11 +18,11 @@ import static model.Utils.roundPoint;
 public class ArchmirePathModel extends GeoShapeModel implements Enemy {
 
     public ArchmirePathModel(Point anchor, String motionPanelId, Boolean isMini) {
-        super(new Point(0, 0), getVertices(isMini), ARCHMIRE_HEALTH.getValue());
+        super(new Point(0, 0), getVertices(isMini), ARCHMIRE_PATH_HEALTH.getValue());
         this.setCircular(false);
         setMotionPanelId(motionPanelId);
         this.setAnchorSave(getCenter());
-        getDamageSize().put(AttackTypes.MELEE, ARCHMIRE_MELEE.getValue());
+        getDamageSize().put(AttackTypes.MELEE, ARCHMIRE_PATH_MELEE.getValue());
         createArchmire(getModelId(), roundPoint(getAnchorSave()), motionPanelId, isMini);
         moveShapeModel(anchor);
         getMovement().setAnchor(anchor);
