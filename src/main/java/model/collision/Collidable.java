@@ -73,6 +73,23 @@ public interface Collidable {
         return analyzeMotion(collidable, collisionPoint);
     }
 
+    default MovementState.CollisionState checkOtherCollisions(Collidable collidable) {
+        if (!(!collide(collidable) || !collidable.collide(this))) return null;
+        MovementState.CollisionState collisionState;
+        try {
+            Point2D collisionPoint;
+            if (isCircular() && collidable.isCircular()) collisionPoint = checkCircularCircularCollision(collidable);
+            else if (isCircular() && !collidable.isCircular())
+                collisionPoint = checkCircularNonCircularCollision(collidable);
+            else if (!isCircular() && collidable.isCircular()) return collidable.checkOtherCollisions(this);
+            else collisionPoint = checkNonCircularNonCircularCollision(collidable);
+            collisionState = analyzeMotion(collidable, collisionPoint);
+        } catch (Exception e) {
+            collisionState = null;
+        }
+        return collisionState;
+    }
+
     default Point2D checkCircularCircularCollision(Collidable collidable) {
         if (getAnchor().distance(collidable.getAnchor()) <= (getRadius() + collidable.getRadius()) + COLLISION_SENSITIVITY.getValue()) {
             return weightedAddPoints(getAnchor(), collidable.getAnchor(), collidable.getRadius(), getRadius());

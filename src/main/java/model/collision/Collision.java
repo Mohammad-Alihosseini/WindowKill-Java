@@ -1,7 +1,6 @@
 package model.collision;
 
 import model.Profile;
-import model.characters.ArchmireModel;
 import model.characters.CollectibleModel;
 import model.characters.EpsilonModel;
 import model.characters.GeoShapeModel;
@@ -10,13 +9,17 @@ import model.entities.Entity;
 import model.frames.MotionPanelModel;
 import model.movement.Direction;
 import model.projectiles.BulletModel;
+import model.projectiles.EnemyBullet;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
+import static controller.UserInterfaceController.toggleMotionPanelView;
+import static controller.constants.EntityConstants.DROWN_COOL_DOWN_SECONDS;
 import static controller.constants.ImpactConstants.IMPACT_RADIUS;
 import static controller.constants.ImpactConstants.IMPACT_SCALE;
 import static model.Utils.*;
@@ -25,6 +28,7 @@ import static model.frames.MotionPanelModel.getMainMotionPanelModel;
 
 public final class Collision implements Runnable {
     private static Collision INSTANCE = null;
+    private static long lastDrownTime = 0;
 
     public static Collision getINSTANCE() {
         if (INSTANCE == null) INSTANCE = new Collision();
@@ -92,20 +96,29 @@ public final class Collision implements Runnable {
         }
     }
 
+    public static void evaluateDrownEffect(MovementState.CollisionState state) {
+        long now = System.nanoTime();
+        if (now - getLastDrownTime() >= TimeUnit.SECONDS.toNanos(DROWN_COOL_DOWN_SECONDS.getValue())) {
+            if (state.stateOf1.collidable instanceof Entity entity1 && state.stateOf2.collidable instanceof Entity entity2 && state.collisionPoint != null) {
+                Pair<Boolean, Boolean> meleePair = checkMelee(state);
+                if (meleePair.getLeft() && meleePair.getRight()) return;
+                if (entity1.isVulnerable() && (state.stateOf2.collidable instanceof BulletModel || state.stateOf1.collidable instanceof CollectibleModel || meleePair.getRight())) {
+                    entity2.damage(entity1, AttackTypes.MELEE);
+                }
+                if (entity2.isVulnerable() && (state.stateOf1.collidable instanceof BulletModel || state.stateOf2.collidable instanceof CollectibleModel || meleePair.getLeft())) {
+                    entity1.damage(entity2, AttackTypes.MELEE);
+                }
+            }
+            setLastDrownTime(now);
+        }
+    }
+
     public static Pair<Boolean, Boolean> checkMelee(MovementState.CollisionState state) {
         boolean melee1to2 = state.stateOf1.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
                 (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
         boolean melee2to1 = state.stateOf2.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
                 (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
         return new MutablePair<>(melee1to2, melee2to1);
-    }
-
-    public static Pair<Boolean, Boolean> checkDrown(MovementState.CollisionState state) {
-        boolean drown1in2 = state.stateOf1.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
-                (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
-        boolean drown2in1 = state.stateOf2.collidable.isGeometryVertex(toCoordinate(state.collisionPoint)) != null &&
-                (state.stateOf1.collidable instanceof EpsilonModel || state.stateOf2.collidable instanceof EpsilonModel);
-        return new MutablePair<>(drown1in2, drown2in1);
     }
 
     public static void resolveCollectiblePickup(MovementState.CollisionState state) {
@@ -117,23 +130,32 @@ public final class Collision implements Runnable {
         }
     }
 
-    public static void resolveDrownDamage(MovementState.CollisionState state) {
-        if (state.stateOf1.collidable instanceof ArchmireModel entity1 && state.stateOf2.collidable instanceof Entity entity2 && state.collisionPoint != null) {
-            Pair<Boolean, Boolean> drownPair = checkDrown(state);
-            if (drownPair.getLeft() && drownPair.getRight()) return;
-            if (entity1.isVulnerable() && (state.stateOf2.collidable instanceof BulletModel || state.stateOf1.collidable instanceof CollectibleModel || drownPair.getRight())) {
-                entity2.damage(entity1, AttackTypes.MELEE);
+    public static void resolveToggleMotionPanelView(MovementState.CollisionState state) {
+        try {
+            if (state.stateOf1.collidable instanceof MotionPanelModel && state.stateOf2.collidable instanceof EnemyBullet entity2) {
+                toggleMotionPanelView(entity2.getModelId(), EpsilonModel.getINSTANCE().getModelId());
             }
-            if (entity2.isVulnerable() && (state.stateOf1.collidable instanceof BulletModel || state.stateOf2.collidable instanceof CollectibleModel || drownPair.getLeft())) {
-                entity1.damage(entity2, AttackTypes.MELEE);
+            if (state.stateOf2.collidable instanceof MotionPanelModel && state.stateOf1.collidable instanceof EnemyBullet entity1) {
+                toggleMotionPanelView(entity1.getModelId(), EpsilonModel.getINSTANCE().getModelId());
             }
+        } catch (Exception ignored) {
         }
+    }
+
+    public static long getLastDrownTime() {
+        return lastDrownTime;
+    }
+
+    public static void setLastDrownTime(long newLastDrownTime) {
+        lastDrownTime = newLastDrownTime;
     }
 
     @Override
     public void run() {
         Collidable.CreateAllGeometries();
         List<MovementState.CollisionState> collisionStates = getAllMomentaryCollisions();
+        List<MovementState.CollisionState> OtherCollisions = getOtherCollisions();
+
         for (MovementState.CollisionState state : collisionStates) {
             boolean notNull = state.stateOf1 != null && state.stateOf2 != null;
             if (!notNull) continue;
@@ -146,6 +168,12 @@ public final class Collision implements Runnable {
             if (areBulletMotionPanel) getMainMotionPanelModel().extend(roundPoint(state.collisionPoint));
             else if (!areEpsilonCollectible) emitImpactWave(state);
         }
+        for (MovementState.CollisionState state : OtherCollisions) {
+            boolean notNull = state.stateOf1 != null && state.stateOf2 != null;
+            if (!notNull) continue;
+            resolveToggleMotionPanelView(state);
+            evaluateDrownEffect(state);
+        }
     }
 
     public List<MovementState.CollisionState> getAllMomentaryCollisions() {
@@ -154,6 +182,18 @@ public final class Collision implements Runnable {
             for (int j = i + 1; j < Collidable.collidables.size(); j++) {
                 MovementState.CollisionState state;
                 state = Collidable.collidables.get(i).checkCollision(Collidable.collidables.get(j));
+                if (state != null) collisionStates.add(state);
+            }
+        }
+        return collisionStates;
+    }
+
+    public List<MovementState.CollisionState> getOtherCollisions() {
+        CopyOnWriteArrayList<MovementState.CollisionState> collisionStates = new CopyOnWriteArrayList<>();
+        for (int i = 0; i < Collidable.collidables.size(); i++) {
+            for (int j = i + 1; j < Collidable.collidables.size(); j++) {
+                MovementState.CollisionState state;
+                state = Collidable.collidables.get(i).checkOtherCollisions(Collidable.collidables.get(j));
                 if (state != null) collisionStates.add(state);
             }
         }

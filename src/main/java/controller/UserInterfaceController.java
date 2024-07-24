@@ -124,6 +124,23 @@ public abstract class UserInterfaceController {
         }
     }
 
+    public static void toggleMotionPanelView(String modelId, String targetModelId) {
+        GeoShapeView shapeView = findView(modelId);
+        GeoShapeModel shapeModel = findModel(modelId);
+        assert shapeModel != null;
+        MotionPanelView shapeMotionPanelView = findMotionPanelView(shapeModel.getMotionPanelId());
+
+        GeoShapeModel targetModel = findModel(targetModelId);
+        assert targetModel != null;
+        MotionPanelView targetMotionPanelView = findMotionPanelView(targetModel.getMotionPanelId());
+
+        assert shapeMotionPanelView != null;
+        shapeMotionPanelView.shapeViews.remove(shapeView);
+        assert targetMotionPanelView != null;
+        targetMotionPanelView.shapeViews.add(shapeView);
+        shapeModel.setMotionPanelId(targetMotionPanelView.getViewId());
+    }
+
     public static void fireSkill() {
         if (Skill.getActiveSkill() != null) Skill.getActiveSkill().fire();
     }
