@@ -65,7 +65,7 @@ public class WyrmModel extends GeoShapeModel implements LongRanged, Enemy {
         Point2D epsilonAnchor = EpsilonModel.getINSTANCE().getAnchor();
         Point2D relativeLocation = relativeLocation(epsilonAnchor, roundPoint(getMovement().getAnchor()));
         hoveringShoot(this, new Direction(relativeLocation),
-                getDamageSize().get(AttackTypes.RANGED), ShooterEntity.Omenoct);
+                getDamageSize().get(AttackTypes.RANGED), ShooterEntity.Wyrm);
     }
 
     @Override

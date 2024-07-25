@@ -23,7 +23,7 @@ public enum MovementConstants {
                     Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed() * 300f / Profile.getCurrent().getUps();
             case DEFAULT_DECELERATION ->
                     Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed() * (-10f) / (Profile.getCurrent().getUps() * Profile.getCurrent().getUps());
-            case MOTION_PANEL_SPEED -> (int) (1200 / Profile.getCurrent().getGameSpeed());
+            case MOTION_PANEL_SPEED -> (int) (1800 / Profile.getCurrent().getGameSpeed());
             case DECELERATION_DECAY ->
                     1 - (2f * Profile.getCurrent().getSizeScale() * Profile.getCurrent().getGameSpeed() / Profile.getCurrent().getUps());
             case DECELERATION_SENSITIVITY -> 0.000001f / Profile.getCurrent().getUps();

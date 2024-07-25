@@ -87,6 +87,7 @@ public abstract class UserInterfaceController {
             case Epsilon -> path = EPSILON_BULLET_IMAGEPATH.getValue();
             case Omenoct -> path = OMENOCT_BULLET_IMAGEPATH.getValue();
             case Necropick -> path = NECROPICK_BULLET_IMAGEPATH.getValue();
+            case Wyrm -> path = WYRM_BULLET_IMAGEPATH.getValue();
             default -> path = BULLET_IMAGEPATH.getValue();
         }
         BulletView view = new BulletView(referenceAnchor, findMotionPanelView(motionPanelId), path);

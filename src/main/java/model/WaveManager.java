@@ -89,7 +89,7 @@ public class WaveManager {
                         multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
                                 random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
                 GeoShapeModel model;
-                if (wave == 0) model = new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
+                if (wave == 0) model = new SquarantineModel(location, getMainMotionPanelId());
                 else {
                     model = switch (random.nextInt(0, 4)) {
                         case 0 -> new SquarantineModel(location, getMainMotionPanelId());
