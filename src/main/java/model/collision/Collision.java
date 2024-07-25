@@ -1,9 +1,7 @@
 package model.collision;
 
 import model.Profile;
-import model.characters.CollectibleModel;
-import model.characters.EpsilonModel;
-import model.characters.GeoShapeModel;
+import model.characters.*;
 import model.entities.AttackTypes;
 import model.entities.Entity;
 import model.frames.MotionPanelModel;
@@ -99,13 +97,25 @@ public final class Collision implements Runnable {
     public static void evaluateDrownEffect(MovementState.CollisionState state) {
         long now = System.nanoTime();
         if (now - getLastDrownTime() >= TimeUnit.SECONDS.toNanos(DROWN_COOL_DOWN_SECONDS.getValue())) {
-            if (state.stateOf1.collidable instanceof Entity entity1 && state.stateOf2.collidable instanceof Entity entity2 && state.collisionPoint != null) {
+            boolean bool1 = state.stateOf1.collidable instanceof ArchmireModel
+                    && state.stateOf2.collidable instanceof EpsilonModel;
+            boolean bool2 = state.stateOf1.collidable instanceof EpsilonModel
+                    && state.stateOf2.collidable instanceof ArchmireModel;
+            boolean bool3 = state.stateOf1.collidable instanceof ArchmirePathModel
+                    && state.stateOf2.collidable instanceof EpsilonModel;
+            boolean bool4 = state.stateOf1.collidable instanceof EpsilonModel
+                    && state.stateOf2.collidable instanceof ArchmirePathModel;
+
+            if ((bool1 || bool2 || bool3 || bool4) && state.collisionPoint != null) {
+                Entity entity1 = (Entity) state.stateOf1.collidable;
+                Entity entity2 = (Entity) state.stateOf2.collidable;
+
                 Pair<Boolean, Boolean> meleePair = checkMelee(state);
                 if (meleePair.getLeft() && meleePair.getRight()) return;
-                if (entity1.isVulnerable() && (state.stateOf2.collidable instanceof BulletModel || state.stateOf1.collidable instanceof CollectibleModel || meleePair.getRight())) {
+                if (entity1.isVulnerable() && entity1 instanceof EpsilonModel) {
                     entity2.damage(entity1, AttackTypes.MELEE);
                 }
-                if (entity2.isVulnerable() && (state.stateOf1.collidable instanceof BulletModel || state.stateOf2.collidable instanceof CollectibleModel || meleePair.getLeft())) {
+                if (entity2.isVulnerable() && entity2 instanceof EpsilonModel) {
                     entity1.damage(entity2, AttackTypes.MELEE);
                 }
             }

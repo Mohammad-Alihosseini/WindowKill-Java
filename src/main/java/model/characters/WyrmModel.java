@@ -34,7 +34,7 @@ public class WyrmModel extends GeoShapeModel implements LongRanged, Enemy {
         setMotionPanelId(motionPanelId);
         this.setAnchorSave(getCenter());
         getDamageSize().put(AttackTypes.RANGED, WYRM_RANGED.getValue());
-        getDamageSize().put(AttackTypes.MELEE, WYRM_RANGED.getValue());
+        getDamageSize().put(AttackTypes.MELEE, WYRM_MELEE.getValue());
         createWyrm(getModelId(), roundPoint(getAnchorSave()), motionPanelId);
         moveShapeModel(anchor);
         getMovement().setAnchor(anchor);
@@ -43,7 +43,6 @@ public class WyrmModel extends GeoShapeModel implements LongRanged, Enemy {
 
         timer = new Timer((int) TimeUnit.SECONDS.toMillis(ENEMY_SHOUTING_RAPIDITY.getValue()), e -> {
             if (MotionPanelView.getMainMotionPanelView() != null) activateShooting();
-            //        toggleMotionPanelView
         });
         timer.start();
     }
@@ -72,9 +71,8 @@ public class WyrmModel extends GeoShapeModel implements LongRanged, Enemy {
     @Override
     public boolean collide(Collidable collidable) {
         return true;
-//        return collidable instanceof GeoShapeModel;
-//
-////        return (collidable instanceof MotionPanelModel);
+//        todo return collidable instanceof GeoShapeModel;
+//        return (collidable instanceof MotionPanelModel);
     }
 
     @Override

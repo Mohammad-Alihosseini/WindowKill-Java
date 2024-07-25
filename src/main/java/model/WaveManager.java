@@ -47,7 +47,6 @@ public class WaveManager {
 
     @NotNull
     private static Timer getOmenoctTimer(GeoShapeModel model, int offset, int side) {
-        //todo set target to motion panel
         Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), null);
         timer.addActionListener(e -> {
             if (MotionPanelView.getMainMotionPanelView() != null) {
@@ -83,24 +82,29 @@ public class WaveManager {
     }
 
     public void randomSpawn(int wave) {
+        // try catch is needed because the random location maybe out of roaster
         for (int i = 0; i < waveCount.get(wave); i++) {
-            Point location = roundPoint(addUpPoints(EpsilonModel.getINSTANCE().getAnchor(),
-                    multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
-                            random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
-            GeoShapeModel model;
-            if (wave == 0) model = new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
-            else {
-                model = switch (random.nextInt(0, 4)) {
-                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
-                    case 1 -> new TrigorathModel(location, getMainMotionPanelId());
-                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
-                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
-                    case 4 -> new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
-                    case 5 -> new WyrmModel(location);
-                    default -> null;
-                };
+            try {
+                Point location = roundPoint(addUpPoints(EpsilonModel.getINSTANCE().getAnchor(),
+                        multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
+                                random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
+                GeoShapeModel model;
+                if (wave == 0) model = new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
+                else {
+                    model = switch (random.nextInt(0, 4)) {
+                        case 0 -> new SquarantineModel(location, getMainMotionPanelId());
+                        case 1 -> new TrigorathModel(location, getMainMotionPanelId());
+                        case 2 -> new OmenoctModel(location, getMainMotionPanelId());
+                        case 3 -> new NecropickModel(location, getMainMotionPanelId());
+                        case 4 -> new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
+                        case 5 -> new WyrmModel(location);
+                        default -> null;
+                    };
+                }
+                if (model != null) waveEntities.add(model);
+            } catch (Exception e) {
+                i--;
             }
-            if (model != null) waveEntities.add(model);
         }
     }
 
