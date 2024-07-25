@@ -133,7 +133,7 @@ public enum Skill {
 
     public void fire() {
         long now = System.nanoTime();
-        if (now - getLastSkillTime() >= TimeUnit.SECONDS.toNanos(SKILL_COOLDOWN_IN_MINUTES.getValue())) {
+        if (now - getLastSkillTime() >= TimeUnit.MINUTES.toNanos(SKILL_COOLDOWN_IN_MINUTES.getValue())) {
             getAction().actionPerformed(new ActionEvent(new Object(), ActionEvent.ACTION_PERFORMED, null));
             setLastSkillTime(now);
         }

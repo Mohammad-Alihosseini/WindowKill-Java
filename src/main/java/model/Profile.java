@@ -30,7 +30,7 @@ public class Profile {
     private String activeSkillSaveName = "";
     private List<String> acquiredSkillsNames = new CopyOnWriteArrayList<>();
     private int totalXP = 600;
-    private int currentGameXP = 100;
+    private int currentGameXP = 300;
 
     @JsonCreator
     public Profile(@JsonProperty("profileId") String profileId, @JsonProperty("waveEnemyCount") List<Integer> waveEnemyCount, @JsonProperty("ups") int ups,

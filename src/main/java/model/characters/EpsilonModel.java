@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import static controller.UserInputHandler.getMouseLocation;
 import static controller.UserInterfaceController.*;
+import static controller.constants.AbilityConstants.PHONOI_ABILITY_SHOOT_DAMAGE;
 import static controller.constants.EntityConstants.EPSILON_HEALTH;
 import static controller.constants.EntityConstants.EPSILON_SHOOTING_RAPIDITY;
 import static controller.constants.EntityConstants.EntityVertices.EPSILON_VERTICES;
@@ -24,6 +25,7 @@ import static model.Utils.*;
 
 public final class EpsilonModel extends GeoShapeModel implements LongRanged {
     private static EpsilonModel INSTANCE;
+    private static boolean Phonoi = false;
     private boolean moveUpIndSave;
     private boolean moveDownIndSave;
     private boolean moveLeftIndSave;
@@ -126,6 +128,10 @@ public final class EpsilonModel extends GeoShapeModel implements LongRanged {
             float mouseAngle = calculateAngle(relativeMouse);
 
             if (UserInputHandler.getINSTANCE().isShootInd()) {
+                if (isPhonoi()) {
+                    shoot(this, new Direction(relativeMouse), (int) PHONOI_ABILITY_SHOOT_DAMAGE.getValue());
+                    setPhonoi(false);
+                }
                 shoot(this, new Direction(relativeMouse), getDamageSize().get(AttackTypes.RANGED));
                 UserInputHandler.getINSTANCE().setShootInd(false);
             }
@@ -147,5 +153,13 @@ public final class EpsilonModel extends GeoShapeModel implements LongRanged {
     @Override
     public void setShootingRapidity(int shootingRapidity) {
         this.shootingRapidity = shootingRapidity;
+    }
+
+    public boolean isPhonoi() {
+        return Phonoi;
+    }
+
+    public static void setPhonoi(boolean phonoi1) {
+        Phonoi = phonoi1;
     }
 }
