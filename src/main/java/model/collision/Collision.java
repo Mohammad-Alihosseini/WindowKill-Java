@@ -17,6 +17,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.toggleMotionPanelView;
+import static controller.constants.AbilityConstants.WRIT_OF_ASTRAPE_DAMAGE;
 import static controller.constants.EntityConstants.DROWN_COOL_DOWN_SECONDS;
 import static controller.constants.ImpactConstants.IMPACT_RADIUS;
 import static controller.constants.ImpactConstants.IMPACT_SCALE;
@@ -27,6 +28,7 @@ import static model.frames.MotionPanelModel.getMainMotionPanelModel;
 public final class Collision implements Runnable {
     private static Collision INSTANCE = null;
     private static long lastDrownTime = 0;
+    private static boolean WritOfAstrape = false;
 
     public static Collision getINSTANCE() {
         if (INSTANCE == null) INSTANCE = new Collision();
@@ -90,6 +92,16 @@ public final class Collision implements Runnable {
             }
             if (entity2.isVulnerable() && (state.stateOf1.collidable instanceof BulletModel || state.stateOf2.collidable instanceof CollectibleModel || meleePair.getLeft())) {
                 entity1.damage(entity2, AttackTypes.MELEE);
+            }
+        }
+    }
+
+    public static void WritOfAstrape(MovementState.CollisionState state) {
+        if (state.stateOf1.collidable instanceof EpsilonModel entity1 && state.stateOf2.collidable instanceof Entity entity2 && state.collisionPoint != null) {
+            Pair<Boolean, Boolean> meleePair = checkMelee(state);
+            if (meleePair.getLeft() && meleePair.getRight()) return;
+            if (entity2.isVulnerable() && entity2 instanceof Enemy) {
+                entity1.damage(entity2, (int) WRIT_OF_ASTRAPE_DAMAGE.getValue());
             }
         }
     }
@@ -160,6 +172,14 @@ public final class Collision implements Runnable {
         lastDrownTime = newLastDrownTime;
     }
 
+    public static boolean isWritOfAstrape() {
+        return WritOfAstrape;
+    }
+
+    public static void setWritOfAstrape(boolean writOfAstrape) {
+        WritOfAstrape = writOfAstrape;
+    }
+
     @Override
     public void run() {
         Collidable.CreateAllGeometries();
@@ -173,6 +193,7 @@ public final class Collision implements Runnable {
             if (state.stateOf2.collidable instanceof BulletModel bulletModel) bulletModel.eliminate();
             evaluatePhysicalEffects(state);
             resolveCollectiblePickup(state);
+            if (isWritOfAstrape()) WritOfAstrape(state);
             boolean areBulletMotionPanel = areInstancesOf(state.stateOf1.collidable, state.stateOf2.collidable, MotionPanelModel.class, BulletModel.class);
             boolean areEpsilonCollectible = areInstancesOf(state.stateOf1.collidable, state.stateOf2.collidable, EpsilonModel.class, CollectibleModel.class);
             if (areBulletMotionPanel) getMainMotionPanelModel().extend(roundPoint(state.collisionPoint));
@@ -182,6 +203,7 @@ public final class Collision implements Runnable {
             boolean notNull = state.stateOf1 != null && state.stateOf2 != null;
             if (!notNull) continue;
             resolveToggleMotionPanelView(state);
+            if (isWritOfAstrape()) WritOfAstrape(state);
             evaluateDrownEffect(state);
         }
     }

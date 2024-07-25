@@ -6,19 +6,31 @@ import model.characters.EpsilonModel;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.*;
 import static controller.constants.AbilityConstants.*;
 import static controller.constants.EntityConstants.SKILL_COOLDOWN_IN_MINUTES;
+import static model.collision.Collision.setWritOfAstrape;
+import static model.entities.Entity.setWritOfChiron;
+import static model.entities.Entity.setWritOfMelampus;
 
 public enum Skill {
     Ares, Astrape, Cerberus,
     Aceso, Melampus, Chiron,
     Proteus, Empusa, Dolus;
 
+    private static final Random RANDOM = new Random();
+    private static final List<Skill> VALUES = Collections.unmodifiableList(Arrays.asList(Skill.values()));
+    private static final int SIZE = VALUES.size();
     private static Skill activeSkill = null;
+    private static Skill randomSkill1 = null;
+    private static Skill randomSkill2 = null;
     private boolean acquired = false;
     private long lastSkillTime = 0;
 
@@ -36,6 +48,21 @@ public enum Skill {
 
     public static void setActiveSkill(Skill activeSkill) {
         Skill.activeSkill = activeSkill;
+    }
+
+    public static Skill getRandomSkill1() {
+        if (randomSkill1 == null) randomSkill1 = VALUES.get(RANDOM.nextInt(SIZE));
+        return randomSkill1;
+    }
+
+    public static Skill getRandomSkill2() {
+        if (randomSkill2 == null) {
+            randomSkill2 = VALUES.get(RANDOM.nextInt(SIZE));
+            while (randomSkill1 == randomSkill2) {
+                randomSkill2 = VALUES.get(RANDOM.nextInt(SIZE));
+            }
+        }
+        return randomSkill2;
     }
 
     public String getName() {
@@ -73,9 +100,7 @@ public enum Skill {
                 Profile.getCurrent().setEpsilonMeleeDamage((int) (Profile.getCurrent().getEpsilonMeleeDamage() + WRIT_OF_ARES_BUFF_AMOUNT.getValue()));
                 Profile.getCurrent().setEpsilonRangedDamage((int) (Profile.getCurrent().getEpsilonRangedDamage() + WRIT_OF_ARES_BUFF_AMOUNT.getValue()));
             };
-            case Astrape -> e -> {
-                //todo collision -> -2hp
-            };
+            case Astrape -> e -> setWritOfAstrape(true);
             case Cerberus -> e -> {
                 //todo 3 circle hovering -> -10hp
             };
@@ -88,26 +113,27 @@ public enum Skill {
                 });
                 healthTimer.start();
             };
-            case Melampus -> e -> {
-                //todo melee safe -> %5 chance
-            };
-            case Chiron -> e -> {
-                //todo +3hp per damage
-            };
+            case Melampus -> e -> setWritOfMelampus(true);
+            case Chiron -> e -> setWritOfChiron(true);
             case Proteus -> e -> EpsilonModel.getINSTANCE().addVertex();
             case Empusa -> e -> {
-                //todo this line those not work
+                //todo 0.9 * epsilon size
+//                EpsilonModel.getINSTANCE().setAnchorSave(deepClone(MINI_EPSILON_CENTER.getValue()));
+//                MotionPanelView.getMainMotionPanelView().shapeViews.remove(EpsilonView.);
+//                createEpsilon();
                 //EPSILON_RADIUS = (int) ((1-0.1) * EPSILON_RADIUS);
             };
             case Dolus -> e -> {
-                //todo 2 skill random
+                System.out.println();
+                getRandomSkill1().fire();
+                getRandomSkill2().fire();
             };
         };
     }
 
     public void fire() {
         long now = System.nanoTime();
-        if (now - getLastSkillTime() >= TimeUnit.MINUTES.toNanos(SKILL_COOLDOWN_IN_MINUTES.getValue())) {
+        if (now - getLastSkillTime() >= TimeUnit.SECONDS.toNanos(SKILL_COOLDOWN_IN_MINUTES.getValue())) {
             getAction().actionPerformed(new ActionEvent(new Object(), ActionEvent.ACTION_PERFORMED, null));
             setLastSkillTime(now);
         }
