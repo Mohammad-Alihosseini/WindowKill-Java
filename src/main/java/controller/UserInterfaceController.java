@@ -8,6 +8,7 @@ import model.characters.GeoShapeModel;
 import model.collision.Collidable;
 import model.entities.Ability;
 import model.entities.Skill;
+import model.frames.IsometricMotionPanelModel;
 import model.frames.MotionPanelModel;
 import model.movement.Movable;
 import model.projectiles.EnemyBullet;
@@ -190,8 +191,9 @@ public abstract class UserInterfaceController {
 
     public static void eliminateMotionPanel(MotionPanelModel motionPanelModel) {
         MotionPanelView motionPanelView = findMotionPanelView(motionPanelModel.getModelId());
-        assert motionPanelView != null;
 
+        System.out.println(motionPanelModel instanceof IsometricMotionPanelModel);
+        assert motionPanelView != null;
         motionPanelView.shapeViews.clear();
         motionPanelView.setVisible(false);
 

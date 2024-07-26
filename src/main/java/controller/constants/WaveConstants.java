@@ -7,7 +7,7 @@ public enum WaveConstants {
         return switch (this) {
             case MIN_ENEMY_SPAWN_RADIUS -> 500;
             case MAX_ENEMY_SPAWN_RADIUS -> 800;
-            case ENEMY_DROP_DELAY_SECONDS -> 2;
+            case ENEMY_DROP_DELAY_SECONDS -> 3;
         };
     }
 }

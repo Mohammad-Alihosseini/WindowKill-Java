@@ -122,7 +122,7 @@ public class WaveManager {
             Point wyrmLocation = wyrmPoints.get(random.nextInt(0, 4));
             GeoShapeModel model;
             if (wave == 0) {
-                model = switch (random.nextInt(0, 1)) {
+                model = switch (random.nextInt(0, 2)) {
                     case 0 -> new SquarantineModel(location, getMainMotionPanelId());
                     case 1 -> new TrigorathModel(location, getMainMotionPanelId());
                     default -> null;
