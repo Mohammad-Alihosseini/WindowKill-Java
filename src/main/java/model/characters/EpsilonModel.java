@@ -61,6 +61,7 @@ public final class EpsilonModel extends GeoShapeModel implements LongRanged {
         super.eliminate();
         Timer timer = new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) showMessage(-1)), e -> {
             exitGame();
+            Profile.getCurrent().saveXP();
             MainMenu.flushINSTANCE();
             MainMenu.getINSTANCE().togglePanel();
         });

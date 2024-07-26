@@ -45,6 +45,7 @@ public class PauseMenu extends PanelB implements TopElement {
                     , JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
             if (action == JOptionPane.YES_OPTION) {
                 exitGame();
+                Profile.getCurrent().saveXP();
                 PauseMenu.getINSTANCE().togglePanel(true);
                 MainMenu.flushINSTANCE();
                 MainMenu.getINSTANCE().togglePanel();
