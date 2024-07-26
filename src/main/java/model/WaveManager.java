@@ -18,9 +18,10 @@ import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.*;
 import static controller.constants.EntityConstants.NECROPICK_DISTANCE_FROM_EPSILON;
-import static controller.constants.WaveConstants.MAX_ENEMY_SPAWN_RADIUS;
-import static controller.constants.WaveConstants.MIN_ENEMY_SPAWN_RADIUS;
+import static controller.constants.WaveConstants.*;
 import static model.Utils.*;
+import static model.characters.Enemy.getNumOfKilledEnemies;
+import static model.characters.Enemy.resetNumOfKilledEnemies;
 
 public class WaveManager {
     public static final Random random = new Random();
@@ -64,53 +65,79 @@ public class WaveManager {
         initiateWave(0);
     }
 
-    public void lockEnemies() {
-        for (GeoShapeModel model : waveEntities) {
-            if (model instanceof SquarantineModel || model instanceof TrigorathModel ||
-                    model instanceof ArchmireModel || model instanceof WyrmModel) {
-                model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
-            } else if (model instanceof OmenoctModel) {
-                int offset = random.nextInt(50, 250);
-                int side = random.nextInt(0, 4);
-                Timer timer = getOmenoctTimer(model, offset, side);
-                timer.start();
-            } else if (model instanceof NecropickModel) {
-                Timer timer = getNecropickTimer(model);
-                timer.start();
-            }
+    public void lockEnemy(GeoShapeModel model) {
+        if (model instanceof SquarantineModel || model instanceof TrigorathModel ||
+                model instanceof ArchmireModel || model instanceof WyrmModel) {
+            model.getMovement().lockOnTarget(EpsilonModel.getINSTANCE().getModelId());
+        } else if (model instanceof OmenoctModel) {
+            int offset = random.nextInt(50, 250);
+            int side = random.nextInt(0, 4);
+            Timer timer = getOmenoctTimer(model, offset, side);
+            timer.start();
+        } else if (model instanceof NecropickModel) {
+            Timer timer = getNecropickTimer(model);
+            timer.start();
         }
     }
 
-    public void randomSpawn(int wave) {
+
+    private void dropOneEnemy(int wave) {
         // try catch is needed because the random location maybe out of roaster
-        for (int i = 0; i < waveCount.get(wave); i++) {
-            try {
-                Point location = roundPoint(addUpPoints(EpsilonModel.getINSTANCE().getAnchor(),
-                        multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
-                                random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
-                GeoShapeModel model;
-                if (wave == 0) model = new SquarantineModel(location, getMainMotionPanelId());
-                else {
-                    model = switch (random.nextInt(0, 4)) {
-                        case 0 -> new SquarantineModel(location, getMainMotionPanelId());
-                        case 1 -> new TrigorathModel(location, getMainMotionPanelId());
-                        case 2 -> new OmenoctModel(location, getMainMotionPanelId());
-                        case 3 -> new NecropickModel(location, getMainMotionPanelId());
-                        case 4 -> new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
-                        case 5 -> new WyrmModel(location);
-                        default -> null;
-                    };
-                }
-                if (model != null) waveEntities.add(model);
-            } catch (Exception e) {
-                i--;
+        try {
+            Point location = roundPoint(addUpPoints(EpsilonModel.getINSTANCE().getAnchor(),
+                    multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
+                            random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
+            GeoShapeModel model;
+            if (wave == 0) {
+                model = switch (random.nextInt(0, 2)) {
+                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
+                    case 1 -> new TrigorathModel(location, getMainMotionPanelId());
+                    default -> null;
+                };
+            } else if (wave == 1) {
+                model = switch (random.nextInt(0, 4)) {
+                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
+                    case 1 -> new TrigorathModel(location, getMainMotionPanelId());
+                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
+                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
+                    default -> null;
+                };
+            } else {
+                model = switch (random.nextInt(0, 6)) {
+                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
+                    case 1 -> new TrigorathModel(location, getMainMotionPanelId());
+                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
+                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
+                    case 4 -> new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
+                    case 5 -> new WyrmModel(location);
+                    default -> null;
+                };
             }
+            if (model != null) {
+                waveEntities.add(model);
+                lockEnemy(model);
+            }
+        } catch (Exception ignored) {
+            dropOneEnemy(wave);
         }
+    }
+
+    private void randomSpawn(int wave) {
+        dropOneEnemy(wave);
+        Timer spawnTimer = new Timer((int) TimeUnit.SECONDS.toMillis(ENEMY_DROP_DELAY_SECONDS.getValue()), null);
+        spawnTimer.addActionListener(e -> {
+            // a threshold for maximum number of enemies is set to 9 * (wave+1)
+            if (getNumOfKilledEnemies() < waveCount.get(wave) && waveEntities.size() < (9 * (wave + 1))) {
+                dropOneEnemy(wave);
+            } else {
+                spawnTimer.stop();
+            }
+        });
+        spawnTimer.start();
     }
 
     private void initiateWave(int wave) {
         randomSpawn(wave);
-        lockEnemies();
         Timer waveTimer = new Timer(10, null);
         waveTimer.addActionListener(e -> {
             boolean waveFinished = true;
@@ -123,6 +150,7 @@ public class WaveManager {
             if (waveFinished) {
                 waveTimer.stop();
                 waveEntities.clear();
+                resetNumOfKilledEnemies();
                 float length = showMessage(waveCount.size() - 1 - wave);
                 if (wave < waveCount.size() - 1) initiateWave(wave + 1);
                 else finishGame(length);
@@ -131,7 +159,7 @@ public class WaveManager {
         waveTimer.start();
     }
 
-    public void finishGame(float lastSceneTime) {
+    private void finishGame(float lastSceneTime) {
         Timer timer = new Timer((int) TimeUnit.NANOSECONDS.toMillis((long) lastSceneTime), e -> {
             exitGame();
             Profile.getCurrent().saveXP();

@@ -14,6 +14,7 @@ import static controller.UserInterfaceController.*;
 import static controller.constants.AbilityConstants.WRIT_OF_CHIRON_HEALING_AMOUNT;
 import static controller.constants.ImpactConstants.MELEE_COOLDOWN;
 import static model.characters.CollectibleModel.bulkCreateCollectibles;
+import static model.characters.Enemy.EnemyEliminated;
 import static model.characters.GeoShapeModel.allShapeModelsList;
 import static model.collision.Collidable.collidables;
 
@@ -77,6 +78,7 @@ public abstract class Entity {
     }
 
     public void eliminate() {
+        if (this instanceof Enemy) EnemyEliminated();
         if (this instanceof GeoShapeModel geoShapeModel) {
             bulkCreateCollectibles((GeoShapeModel) this);
             allShapeModelsList.remove(this);

@@ -169,9 +169,9 @@ public abstract class UserInterfaceController {
             motionPanelView.shapeViews.clear();
             motionPanelView.setVisible(false);
         }
-        for (GeoShapeModel model: allShapeModelsList )
+        for (GeoShapeModel model : allShapeModelsList)
             if (model instanceof Enemy || model instanceof EnemyBullet) model.eliminate();
-
+        Enemy.resetNumOfKilledEnemies();
         setMainMotionPanelModel(null);
         setMainMotionPanelView(null);
         allMotionPanelViewsList.clear();
