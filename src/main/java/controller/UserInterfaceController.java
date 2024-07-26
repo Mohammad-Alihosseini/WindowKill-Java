@@ -2,6 +2,7 @@ package controller;
 
 import model.JsonOperator;
 import model.Profile;
+import model.characters.Enemy;
 import model.characters.EpsilonModel;
 import model.characters.GeoShapeModel;
 import model.collision.Collidable;
@@ -9,6 +10,7 @@ import model.entities.Ability;
 import model.entities.Skill;
 import model.frames.MotionPanelModel;
 import model.movement.Movable;
+import model.projectiles.EnemyBullet;
 import model.projectiles.ShooterEntity;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -167,6 +169,9 @@ public abstract class UserInterfaceController {
             motionPanelView.shapeViews.clear();
             motionPanelView.setVisible(false);
         }
+        for (GeoShapeModel model: allShapeModelsList )
+            if (model instanceof Enemy || model instanceof EnemyBullet) model.eliminate();
+
         setMainMotionPanelModel(null);
         setMainMotionPanelView(null);
         allMotionPanelViewsList.clear();
