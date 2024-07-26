@@ -5,6 +5,9 @@ import model.frames.MotionPanelModel;
 import model.movement.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.operation.distance.DistanceOp;
 import view.containers.MotionPanelView;
 import view.menu.MainMenu;
 
@@ -30,7 +33,6 @@ public class WaveManager {
 
     @NotNull
     private static Timer getNecropickTimer(GeoShapeModel model) {
-        // todo radius of epsilon
         Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), null);
         timer.addActionListener(e -> {
             if (MotionPanelView.getMainMotionPanelView() != null) {
@@ -44,6 +46,30 @@ public class WaveManager {
             }
         });
         return timer;
+    }
+
+    // todo expensive cost to use this logic for target of Necropick
+    @NotNull
+    private static Point2D getInstantaneousTarget(GeoShapeModel model) {
+        List<Point2D> vertices = getVertices();
+        Coordinate[] coordinates = new Coordinate[vertices.size() + 1];
+        for (int i = 0; i < vertices.size(); i++) coordinates[i] = toCoordinate(vertices.get(i));
+        coordinates[vertices.size()] = toCoordinate(vertices.get(0));
+        Geometry geometry = new GeometryFactory().createLineString(coordinates);
+        Coordinate target = DistanceOp.nearestPoints(geometry, model.getGeometry())[0];
+        return new Point2D.Double(target.x, target.y);
+    }
+
+    @NotNull
+    private static List<Point2D> getVertices() {
+        Point2D epsilon = EpsilonModel.getINSTANCE().getAnchor();
+        int offset = NECROPICK_DISTANCE_FROM_EPSILON.getValue();
+        return new CopyOnWriteArrayList<>(
+                List.of(new Point2D.Double(epsilon.getX() + offset, epsilon.getY() + offset),
+                        new Point2D.Double(epsilon.getX() + offset, epsilon.getY() - offset),
+                        new Point2D.Double(epsilon.getX() - offset, epsilon.getY() - offset),
+                        new Point2D.Double(epsilon.getX() - offset, epsilon.getY() + offset)
+                ));
     }
 
     @NotNull
@@ -89,8 +115,8 @@ public class WaveManager {
                             random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
             GeoShapeModel model;
             if (wave == 0) {
-                model = switch (random.nextInt(0, 2)) {
-                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
+                model = switch (random.nextInt(0, 1)) {
+                    case 0 -> new NecropickModel(location, getMainMotionPanelId());
                     case 1 -> new TrigorathModel(location, getMainMotionPanelId());
                     default -> null;
                 };
@@ -127,7 +153,7 @@ public class WaveManager {
         Timer spawnTimer = new Timer((int) TimeUnit.SECONDS.toMillis(ENEMY_DROP_DELAY_SECONDS.getValue()), null);
         spawnTimer.addActionListener(e -> {
             // a threshold for maximum number of enemies is set to 9 * (wave+1)
-            if (getNumOfKilledEnemies() < waveCount.get(wave) && waveEntities.size() < (9 * (wave + 1))) {
+            if (getNumOfKilledEnemies() < waveCount.get(wave) && waveEntities.size() < (5 * (wave + 1))) {
                 dropOneEnemy(wave);
             } else {
                 spawnTimer.stop();
