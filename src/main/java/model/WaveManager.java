@@ -28,6 +28,12 @@ import static model.characters.Enemy.resetNumOfKilledEnemies;
 
 public class WaveManager {
     public static final Random random = new Random();
+    private static final List<Point> wyrmPoints = new CopyOnWriteArrayList<>(
+            List.of(new Point(200, 200),
+                    new Point(200, 800),
+                    new Point(1500, 200),
+                    new Point(1500, 800))
+    );
     public final List<Integer> waveCount = Profile.getCurrent().getWaveEnemyCount();
     private final List<GeoShapeModel> waveEntities = new CopyOnWriteArrayList<>();
 
@@ -113,10 +119,11 @@ public class WaveManager {
             Point location = roundPoint(addUpPoints(EpsilonModel.getINSTANCE().getAnchor(),
                     multiplyPoint(new Direction(random.nextFloat(0, 360)).getDirectionVector(),
                             random.nextFloat(MIN_ENEMY_SPAWN_RADIUS.getValue(), MAX_ENEMY_SPAWN_RADIUS.getValue()))));
+            Point wyrmLocation = wyrmPoints.get(random.nextInt(0, 4));
             GeoShapeModel model;
             if (wave == 0) {
                 model = switch (random.nextInt(0, 1)) {
-                    case 0 -> new NecropickModel(location, getMainMotionPanelId());
+                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
                     case 1 -> new TrigorathModel(location, getMainMotionPanelId());
                     default -> null;
                 };
@@ -135,7 +142,7 @@ public class WaveManager {
                     case 2 -> new OmenoctModel(location, getMainMotionPanelId());
                     case 3 -> new NecropickModel(location, getMainMotionPanelId());
                     case 4 -> new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
-                    case 5 -> new WyrmModel(location);
+                    case 5 -> new WyrmModel(wyrmLocation);
                     default -> null;
                 };
             }
@@ -152,7 +159,7 @@ public class WaveManager {
         dropOneEnemy(wave);
         Timer spawnTimer = new Timer((int) TimeUnit.SECONDS.toMillis(ENEMY_DROP_DELAY_SECONDS.getValue()), null);
         spawnTimer.addActionListener(e -> {
-            // a threshold for maximum number of enemies is set to 9 * (wave+1)
+            // a threshold for maximum number of enemies is set to 5 * (wave+1)
             if (getNumOfKilledEnemies() < waveCount.get(wave) && waveEntities.size() < (5 * (wave + 1))) {
                 dropOneEnemy(wave);
             } else {

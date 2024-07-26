@@ -79,8 +79,14 @@ public abstract class UserInterfaceController {
     }
 
     public static void createCollectible(String modelId, String ancestorId, int value, Point anchor, String motionPanelId) {
-        CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), findMotionPanelView(motionPanelId));
-        collectibleView.setViewId(modelId);
+        MotionPanelView motionPanelView = findMotionPanelView(motionPanelId);
+        if (motionPanelView != null) {
+            CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), motionPanelView);
+            collectibleView.setViewId(modelId);
+        } else {
+            CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), MotionPanelView.getMainMotionPanelView());
+            collectibleView.setViewId(modelId);
+        }
     }
 
     public static void createBullet(String modelId, Point referenceAnchor, String motionPanelId, ShooterEntity shooter) {
@@ -180,6 +186,20 @@ public abstract class UserInterfaceController {
         allShapeViewsList.clear();
         Collidable.collidables.clear();
         Movable.movables.clear();
+    }
+
+    public static void eliminateMotionPanel(MotionPanelModel motionPanelModel) {
+        MotionPanelView motionPanelView = findMotionPanelView(motionPanelModel.getModelId());
+        assert motionPanelView != null;
+
+        motionPanelView.shapeViews.clear();
+        motionPanelView.setVisible(false);
+
+        allMotionPanelViewsList.remove(motionPanelView);
+        allMotionPanelModelsList.remove(motionPanelModel);
+
+        Collidable.collidables.remove(motionPanelModel);
+        Movable.movables.remove(motionPanelModel);
     }
 
     public static void playGameTheme(Container container) {

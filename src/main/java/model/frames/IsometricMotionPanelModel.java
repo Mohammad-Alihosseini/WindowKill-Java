@@ -3,6 +3,8 @@ package model.frames;
 import controller.TypedActionListener;
 import model.characters.EpsilonModel;
 import model.characters.GeoShapeModel;
+import model.collision.Collidable;
+import model.projectiles.BulletModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -45,6 +47,13 @@ public class IsometricMotionPanelModel extends MotionPanelModel {
         sideY = (getLocation().getY() + getDimension().getY() - point.y) >= (point.y - getLocation().getY()) ?
                 TypedActionListener.Side.TOP : TypedActionListener.Side.BOTTOM;
         return new TypedActionListener.Side[]{sideX, sideY};
+    }
+
+    @Override
+    public boolean collide(Collidable collidable) {
+        boolean one = !(collidable instanceof EpsilonModel);
+        boolean two = !(collidable instanceof BulletModel);
+        return one && two;
     }
 }
 

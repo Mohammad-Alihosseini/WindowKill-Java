@@ -160,6 +160,24 @@ public final class Collision implements Runnable {
             if (state.stateOf2.collidable instanceof MotionPanelModel && state.stateOf1.collidable instanceof EnemyBullet entity1) {
                 toggleMotionPanelView(entity1.getModelId(), EpsilonModel.getINSTANCE().getModelId());
             }
+            if (state.stateOf1.collidable == MotionPanelModel.getMainMotionPanelModel() && state.stateOf2.collidable instanceof WyrmModel entity2) {
+                toggleMotionPanelView(entity2.getModelId(), EpsilonModel.getINSTANCE().getModelId());
+            }
+            if (state.stateOf2.collidable == MotionPanelModel.getMainMotionPanelModel() && state.stateOf1.collidable instanceof WyrmModel entity1) {
+                toggleMotionPanelView(entity1.getModelId(), EpsilonModel.getINSTANCE().getModelId());
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    public static void resolveToggleWyrmMotionPanelView(MovementState.CollisionState state) {
+        try {
+            if (state.stateOf1.collidable == MotionPanelModel.getMainMotionPanelModel() && state.stateOf2.collidable instanceof WyrmModel entity2) {
+                toggleMotionPanelView(entity2.getModelId(), EpsilonModel.getINSTANCE().getModelId());
+            }
+            if (state.stateOf2.collidable == MotionPanelModel.getMainMotionPanelModel() && state.stateOf1.collidable instanceof WyrmModel entity1) {
+                toggleMotionPanelView(entity1.getModelId(), EpsilonModel.getINSTANCE().getModelId());
+            }
         } catch (Exception ignored) {
         }
     }
@@ -192,6 +210,7 @@ public final class Collision implements Runnable {
             if (state.stateOf1.collidable instanceof BulletModel bulletModel) bulletModel.eliminate();
             if (state.stateOf2.collidable instanceof BulletModel bulletModel) bulletModel.eliminate();
             evaluatePhysicalEffects(state);
+            resolveToggleWyrmMotionPanelView(state);
             resolveCollectiblePickup(state);
             if (isWritOfAstrape()) WritOfAstrape(state);
             boolean areBulletMotionPanel = areInstancesOf(state.stateOf1.collidable, state.stateOf2.collidable, MotionPanelModel.class, BulletModel.class);

@@ -3,6 +3,7 @@ package model.characters;
 import model.collision.Collidable;
 import model.entities.AttackTypes;
 import model.frames.IsometricMotionPanelModel;
+import model.frames.MotionPanelModel;
 import model.movement.Direction;
 import model.projectiles.LongRanged;
 import model.projectiles.ShooterEntity;
@@ -14,6 +15,7 @@ import java.awt.geom.Point2D;
 import java.util.concurrent.TimeUnit;
 
 import static controller.UserInterfaceController.createWyrm;
+import static controller.UserInterfaceController.eliminateMotionPanel;
 import static controller.constants.DimensionConstants.WYRM_DIMENSION;
 import static controller.constants.EntityConstants.*;
 import static controller.constants.EntityConstants.EntityVertices.WYRM_VERTICES;
@@ -70,14 +72,13 @@ public class WyrmModel extends GeoShapeModel implements LongRanged, Enemy {
 
     @Override
     public boolean collide(Collidable collidable) {
-        return true;
-//        todo return collidable instanceof GeoShapeModel;
-//        return (collidable instanceof MotionPanelModel);
+        return collidable != MotionPanelModel.getMainMotionPanelModel();
     }
 
     @Override
     public void eliminate() {
         timer.stop();
+        eliminateMotionPanel(isometricMotionPanelModel);
         super.eliminate();
     }
 

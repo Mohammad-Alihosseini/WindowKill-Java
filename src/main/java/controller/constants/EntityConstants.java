@@ -108,10 +108,10 @@ public enum EntityConstants {
                         ));
 
                 case WYRM_VERTICES -> new CopyOnWriteArrayList<>(
-                        List.of(new Point2D.Float(WYRM_DIMENSION.getValue().width / 3F, 0),
-                                new Point2D.Float(2 * WYRM_DIMENSION.getValue().width / 3F, WYRM_DIMENSION.getValue().height),
-                                new Point2D.Float(0, 4 * WYRM_DIMENSION.getValue().height / 5F),
-                                new Point2D.Float(WYRM_DIMENSION.getValue().width, WYRM_DIMENSION.getValue().height / 5F)
+                        List.of(new Point2D.Float(WYRM_DIMENSION.getValue().width / 2F, 0),
+                                new Point2D.Float(WYRM_DIMENSION.getValue().width / 2F, WYRM_DIMENSION.getValue().height),
+                                new Point2D.Float(0, WYRM_DIMENSION.getValue().height / 3F),
+                                new Point2D.Float(WYRM_DIMENSION.getValue().width, 2 * WYRM_DIMENSION.getValue().height / 3F)
                         ));
                 case BULLET_VERTICES, EPSILON_VERTICES, COLLECTIBLE_VERTICES -> new CopyOnWriteArrayList<>();
             };
