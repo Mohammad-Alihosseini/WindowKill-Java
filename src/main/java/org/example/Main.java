@@ -27,13 +27,5 @@ public class Main {
             getGlassFrame();
             LoginPage.getINSTANCE().togglePanel();
         });
-//        Geometry geometry = new GeometryFactory().createLineString(new Coordinate[]{
-//                new Coordinate(1, 2),
-//                new Coordinate(3, 4),
-//                new Coordinate(5, 6),
-//                new Coordinate(7, 8),
-//                new Coordinate(9, 10)});
-//        Coordinate[] coordinates = geometry.getCoordinates();
-//        System.out.println(coordinates.length);
     }
 }
