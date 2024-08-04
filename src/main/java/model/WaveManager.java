@@ -5,9 +5,6 @@ import model.frames.MotionPanelModel;
 import model.movement.Direction;
 import org.jetbrains.annotations.NotNull;
 import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.operation.distance.DistanceOp;
 import view.containers.MotionPanelView;
 import view.menu.MainMenu;
 
@@ -27,18 +24,19 @@ import static model.characters.Enemy.getNumOfKilledEnemies;
 import static model.characters.Enemy.resetNumOfKilledEnemies;
 
 public class WaveManager {
-    public static final Random random = new Random();
-    private static final List<Point> wyrmPoints = new CopyOnWriteArrayList<>(
+    private static final Random random = new Random();
+    private final List<Point> wyrmPoints = new CopyOnWriteArrayList<>(
             List.of(new Point(200, 200),
                     new Point(200, 800),
                     new Point(1500, 200),
                     new Point(1500, 800))
     );
-    public final List<Integer> waveCount = Profile.getCurrent().getWaveEnemyCount();
+    private final List<Integer> waveCount = Profile.getCurrent().getWaveEnemyCount();
     private final List<GeoShapeModel> waveEntities = new CopyOnWriteArrayList<>();
+    private AutomatedRandomSpawn automatedRandomSpawn;
 
     @NotNull
-    private static Timer getNecropickTimer(GeoShapeModel model) {
+    private Timer getNecropickTimer(GeoShapeModel model) {
         Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), null);
         timer.addActionListener(e -> {
             if (MotionPanelView.getMainMotionPanelView() != null) {
@@ -54,32 +52,9 @@ public class WaveManager {
         return timer;
     }
 
-    // todo expensive cost to use this logic for target of Necropick
-    @NotNull
-    private static Point2D getInstantaneousTarget(GeoShapeModel model) {
-        List<Point2D> vertices = getVertices();
-        Coordinate[] coordinates = new Coordinate[vertices.size() + 1];
-        for (int i = 0; i < vertices.size(); i++) coordinates[i] = toCoordinate(vertices.get(i));
-        coordinates[vertices.size()] = toCoordinate(vertices.get(0));
-        Geometry geometry = new GeometryFactory().createLineString(coordinates);
-        Coordinate target = DistanceOp.nearestPoints(geometry, model.getGeometry())[0];
-        return new Point2D.Double(target.x, target.y);
-    }
 
     @NotNull
-    private static List<Point2D> getVertices() {
-        Point2D epsilon = EpsilonModel.getINSTANCE().getAnchor();
-        int offset = NECROPICK_DISTANCE_FROM_EPSILON.getValue();
-        return new CopyOnWriteArrayList<>(
-                List.of(new Point2D.Double(epsilon.getX() + offset, epsilon.getY() + offset),
-                        new Point2D.Double(epsilon.getX() + offset, epsilon.getY() - offset),
-                        new Point2D.Double(epsilon.getX() - offset, epsilon.getY() - offset),
-                        new Point2D.Double(epsilon.getX() - offset, epsilon.getY() + offset)
-                ));
-    }
-
-    @NotNull
-    private static Timer getOmenoctTimer(GeoShapeModel model, int offset, int side) {
+    private Timer getOmenoctTimer(GeoShapeModel model, int offset, int side) {
         Timer timer = new Timer((int) TimeUnit.SECONDS.toMillis(1), null);
         timer.addActionListener(e -> {
             if (MotionPanelView.getMainMotionPanelView() != null) {
@@ -94,6 +69,7 @@ public class WaveManager {
     }
 
     public void start() {
+        automatedRandomSpawn = new AutomatedRandomSpawn(this);
         initiateWave(0);
     }
 
@@ -156,12 +132,12 @@ public class WaveManager {
     }
 
     private void randomSpawn(int wave) {
-        dropOneEnemy(wave);
+        automatedRandomSpawn.dropOneEnemy(wave);
         Timer spawnTimer = new Timer((int) TimeUnit.SECONDS.toMillis(ENEMY_DROP_DELAY_SECONDS.getValue()), null);
         spawnTimer.addActionListener(e -> {
             // a threshold for maximum number of enemies is set to 5 * (wave+1)
             if (getNumOfKilledEnemies() < waveCount.get(wave) && waveEntities.size() < (5 * (wave + 1))) {
-                dropOneEnemy(wave);
+                automatedRandomSpawn.dropOneEnemy(wave);
             } else {
                 spawnTimer.stop();
             }
@@ -201,5 +177,9 @@ public class WaveManager {
         });
         timer.setRepeats(false);
         timer.start();
+    }
+
+    public void addEnemyToWaveEntities(GeoShapeModel model) {
+        waveEntities.add(model);
     }
 }
