@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -72,34 +73,26 @@ public class AutomatedRandomSpawn {
         // try catch is needed because the random location maybe out of roaster
         try {
             GeoShapeModel model;
-            model = constructClass(enemySubclasses.getFirst());
-            //TODO MAKE MODEL BASE ON WAVE NUM AND ENEMY
+            //TODO WYRM HAS PROBLEMS EITHER EXCLUDE IT OR RESOLVE THE PROBLEM.
 
-//            if (wave == 0) {
-//                model = switch (random.nextInt(0, 2)) {
-//                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
-//                    case 1 -> new TrigorathModel(location, getMainMotionPanelId());
-//                    default -> null;
-//                };
-//            } else if (wave == 1) {
-//                model = switch (random.nextInt(0, 4)) {
-//                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
-//                    case 1 -> new TrigorathModel(location, getMainMotionPanelId());
-//                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
-//                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
-//                    default -> null;
-//                };
-//            } else {
-//                model = switch (random.nextInt(0, 6)) {
-//                    case 0 -> new SquarantineModel(location, getMainMotionPanelId());
-//                    case 1 -> new TrigorathModel(location, getMainMotionPanelId());
-//                    case 2 -> new OmenoctModel(location, getMainMotionPanelId());
-//                    case 3 -> new NecropickModel(location, getMainMotionPanelId());
-//                    case 4 -> new ArchmireModel(location, getMainMotionPanelId(), random.nextBoolean());
-//                    case 5 -> new WyrmModel(wyrmLocation);
-//                    default -> null;
-//                };
-//            }
+            if (wave == 0) {
+                model = switch (random.nextInt(0, 2)) {
+                    case 0 -> constructClass(findClassByName(enemySubclasses, "SquarantineModel"));
+                    case 1 -> constructClass(findClassByName(enemySubclasses, "TrigorathModel"));
+                    default -> null;
+                };
+            } else if (wave == 1) {
+                model = switch (random.nextInt(0, 4)) {
+                    case 0 -> constructClass(findClassByName(enemySubclasses, "SquarantineModel"));
+                    case 1 -> constructClass(findClassByName(enemySubclasses, "TrigorathModel"));
+                    case 2 -> constructClass(findClassByName(enemySubclasses, "OmenoctModel"));
+                    case 3 -> constructClass(findClassByName(enemySubclasses, "NecropickModel"));
+                    default -> null;
+                };
+            } else {
+                System.out.println(enemySubclasses.get(random.nextInt(0, enemySubclasses.size())).getName());
+                model = constructClass(enemySubclasses.get(random.nextInt(0, enemySubclasses.size())));
+            }
             if (model != null) {
                 waveManager.addEnemyToWaveEntities(model);
                 waveManager.lockEnemy(model);
@@ -110,6 +103,7 @@ public class AutomatedRandomSpawn {
     }
 
     private GeoShapeModel constructClass(Class<?> cls) {
+        Objects.requireNonNull(cls);
         GeoShapeModel instance;
         Constructor<?> constructor = cls.getConstructors()[0];
         try {
@@ -118,5 +112,14 @@ public class AutomatedRandomSpawn {
             throw new RuntimeException(e);
         }
         return instance;
+    }
+
+    private Class<?> findClassByName(List<Class<?>> classes, String className) {
+        for (Class<?> clazz : classes) {
+            if (clazz.getName().contains(className) || clazz.getSimpleName().contains(className)) {
+                return clazz;
+            }
+        }
+        return null;
     }
 }

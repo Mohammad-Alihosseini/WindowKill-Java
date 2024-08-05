@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -19,7 +20,7 @@ public class SubclassFinder {
         List<File> dirs = new ArrayList<>();
         while (resources.hasMoreElements()) {
             URL resource = resources.nextElement();
-            dirs.add(new File(URLDecoder.decode(resource.getFile(), "UTF-8")));
+            dirs.add(new File(URLDecoder.decode(resource.getFile(), StandardCharsets.UTF_8)));
         }
         List<Class<?>> classes = new ArrayList<>();
         for (File directory : dirs) {
@@ -40,22 +41,36 @@ public class SubclassFinder {
                     assert !file.getName().contains(".");
                     classes.addAll(findClasses(file, packageName + "." + file.getName()));
                 } else if (file.getName().endsWith(".class")) {
-                    classes.add(Class.forName(packageName + '.' + file.getName().substring(0, file.getName().length() - 6)));
+                    classes.add(Class.forName(
+                            packageName + '.' + file.getName().substring(0, file.getName().length() - 6))
+                    );
                 }
             }
         }
         return classes;
     }
 
-    public static CopyOnWriteArrayList<Class<?>> findEnemySubclasses(String packageName, Class<?> superClass) throws ClassNotFoundException, IOException {
+    public static CopyOnWriteArrayList<Class<?>> findEnemySubclasses(String packageName, Class<?> superClass)
+            throws ClassNotFoundException, IOException {
         List<Class<?>> allClasses = getAllClasses(packageName);
         CopyOnWriteArrayList<Class<?>> subclasses = new CopyOnWriteArrayList<>();
         for (Class<?> clazz : allClasses) {
-            if (superClass.isAssignableFrom(clazz) && !clazz.equals(superClass)) {
+            if (superClass.isAssignableFrom(clazz) && !clazz.equals(superClass) && !clazz.getName().contains("ArchmirePath")) {
                 subclasses.add(clazz);
             }
         }
         return subclasses;
     }
+
+//    public static void main(String[] args) {
+//        try {
+//            List<Class<?>> subclasses = findEnemySubclasses("model.characters", Enemy.class);
+//            for (Class<?> subclass : subclasses) {
+//                System.out.println(subclass.getName());
+//            }
+//        } catch (ClassNotFoundException | IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
 
