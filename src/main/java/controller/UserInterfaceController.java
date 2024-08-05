@@ -80,13 +80,13 @@ public abstract class UserInterfaceController {
 
     public static void createCollectible(String modelId, String ancestorId, int value, Point anchor, String motionPanelId) {
         MotionPanelView motionPanelView = findMotionPanelView(motionPanelId);
+        CollectibleView collectibleView;
         if (motionPanelView != null) {
-            CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), motionPanelView);
-            collectibleView.setViewId(modelId);
+            collectibleView = new CollectibleView(anchor, value, findView(ancestorId), motionPanelView);
         } else {
-            CollectibleView collectibleView = new CollectibleView(anchor, value, findView(ancestorId), MotionPanelView.getMainMotionPanelView());
-            collectibleView.setViewId(modelId);
+            collectibleView = new CollectibleView(anchor, value, findView(ancestorId), MotionPanelView.getMainMotionPanelView());
         }
+        collectibleView.setViewId(modelId);
     }
 
     public static void createBullet(String modelId, Point referenceAnchor, String motionPanelId, ShooterEntity shooter) {
